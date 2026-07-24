@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = ["crates/kvp-core"]
+
+[workspace.package]
+edition = "2021"
+license = "LicenseRef-Proprietary"
+version = "0.1.0"

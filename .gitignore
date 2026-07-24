@@ -1,0 +1,23 @@
+/target/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+/.idea/
+/.vscode/
+*.log
+*.pem
+*.key
+*.p12
+.pfx
+.env
+.env.*
+!.env.example
+*service-account*.json
+*credentials*.json
+firebase-adminsdk*.json
+
+# Локальные исходники и экспорты сохраняются на рабочей станции, но не
+# публикуются в репозитории. Канонические версии находятся в docs/.
+/deepseek_markdown_*.md
+/*.docx
