@@ -1,6 +1,6 @@
 {
   "name": "KVP Kernel",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "cryptography": {
     "algorithm": "ECDSA",
     "curve": "secp256k1",
@@ -9,7 +9,14 @@
   },
   "storage": {
     "wallets": "wallets.json",
-    "ledger": "ledger.json"
+    "ledger": "ledger.json",
+    "log": "transactions.log"
+  },
+  "features": {
+    "logging": true,
+    "validation": true,
+    "csv_export": true,
+    "class_based": true
   },
   "builder": "Soul 5/6",
   "lighthouse": "netcity888netcity@gmail.com",
