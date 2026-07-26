@@ -9,7 +9,11 @@ venv/
 *.pem
 *.key
 *.p12
-.pfx
+*.pfx
+*.jks
+*.keystore
+.envrc
+secrets/
 .env
 .env.*
 !.env.example
