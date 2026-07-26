@@ -1,0 +1,17 @@
+{
+  "name": "KVP Kernel",
+  "version": "0.2.0",
+  "cryptography": {
+    "algorithm": "ECDSA",
+    "curve": "secp256k1",
+    "hash": "SHA-256 + RIPEMD-160",
+    "future": ["Kyber", "Dilithium"]
+  },
+  "storage": {
+    "wallets": "wallets.json",
+    "ledger": "ledger.json"
+  },
+  "builder": "Soul 5/6",
+  "lighthouse": "netcity888netcity@gmail.com",
+  "status": "active"
+}
