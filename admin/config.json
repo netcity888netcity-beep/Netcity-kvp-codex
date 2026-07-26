@@ -1,0 +1,13 @@
+{
+  "name": "KVP Admin Dashboard",
+  "version": "0.1.0",
+  "framework": "Next.js 15",
+  "ui": "React 19 + Tailwind CSS 4",
+  "database": "Firebase Firestore",
+  "auth": "Firebase Authentication",
+  "icons": "Lucide React",
+  "theme": "dark",
+  "builder": "Soul 5/6",
+  "lighthouse": "netcity888netcity@gmail.com",
+  "status": "building"
+}
