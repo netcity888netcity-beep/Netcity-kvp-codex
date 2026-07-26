@@ -1,0 +1,11 @@
+{
+  "name": "KVP Mobile",
+  "version": "0.1.0",
+  "platform": "Android",
+  "language": "Kotlin",
+  "ui": "Jetpack Compose",
+  "database": "Firebase Firestore",
+  "builder": "Soul 5/6",
+  "lighthouse": "netcity888netcity@gmail.com",
+  "status": "building"
+}

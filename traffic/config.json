@@ -1,0 +1,8 @@
+{
+  "name": "KVP Traffic",
+  "version": "0.1.0",
+  "channels": ["avito", "telegram", "yandex_maps"],
+  "builder": "Soul 5/6",
+  "lighthouse": "netcity888netcity@gmail.com",
+  "status": "building"
+}

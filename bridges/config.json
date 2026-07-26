@@ -1,0 +1,8 @@
+{
+  "name": "KVP Bridges",
+  "version": "0.1.0",
+  "layers": ["AR", "BioLink", "Quantum"],
+  "builder": "Soul 5/6",
+  "lighthouse": "netcity888netcity@gmail.com",
+  "status": "concept"
+}
