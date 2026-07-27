@@ -5,6 +5,7 @@ __pycache__/
 venv/
 /.idea/
 /.vscode/
+/.local/
 *.log
 *.pem
 *.key
