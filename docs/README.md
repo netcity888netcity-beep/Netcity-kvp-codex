@@ -15,6 +15,7 @@ invariant.
 6. [Enterprise Workspace](enterprise-workspace.md) — operator interface and scenarios.
 7. [Architect OS](architect-os.md) — architecture graph and plan compilation.
 8. [Model/tool fabric](model-tool-fabric.md) — local/cloud models and tool connectors.
+   - [KVP Model Gateway MVP](model-gateway-mvp.md) — implemented provider contract, registry, and local-only policy.
 9. [Fleet management](fleet-management.md) — lifecycle and large-scale operations.
 10. [KVP system architecture](kvp-architecture.md) — protected protocol control plane.
 11. [Protocol lifecycle](protocol-lifecycle.md) — sessions, commands, retries, and errors.

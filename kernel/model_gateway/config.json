@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "sensitive_data_policy": "local_only",
+  "providers": {
+    "mock": {
+      "enabled": true,
+      "models": ["mock/local-echo"]
+    },
+    "github_models": {
+      "enabled": false,
+      "credential_env": "GITHUB_MODELS_TOKEN",
+      "models": []
+    }
+  }
+}
