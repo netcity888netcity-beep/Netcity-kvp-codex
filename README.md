@@ -1,5 +1,8 @@
 # NetCityOS
 
+> **Builders wanted:** read the evidence-driven [open call](BUILDERS_CALL.md),
+> [contribution guide](CONTRIBUTING.md), and [security policy](SECURITY.md).
+
 NetCityOS is a closed-source Enterprise operating environment for designing,
 governing, and operating local and cloud model fleets, agents, tools, and
 multi-layer architectures. It is delivered as a complete Linux-based appliance

@@ -1,0 +1,55 @@
+name: Builder task
+description: Propose or claim a bounded, evidence-driven contribution
+title: "[Builder]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping build KVP / NetCityOS. Do not include secrets,
+        personal data, machine audit reports, or vulnerability details here.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What specific, reproducible problem should be solved?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Bounded scope
+      description: Which files, component, or contract are in scope and out of scope?
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Acceptance evidence
+      description: Which exact tests or observations will demonstrate completion?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - KVP Core
+        - Model Gateway
+        - Command Bridge
+        - Protocol / protobuf
+        - Testing / CI
+        - Documentation
+        - Android / Admin / Agent prototype
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety acknowledgement
+      options:
+        - label: I will not include credentials, private data, or machine audit artifacts.
+          required: true
+        - label: I will not test systems without explicit authorization.
+          required: true
