@@ -5,15 +5,34 @@ import { LockKeyhole, Mail } from 'lucide-react';
 
 interface LoginPageProps {
   onSubmit?: (email: string, password: string) => void | Promise<void>;
+  email?: string;
+  setupRequired?: boolean;
+  error?: string;
 }
 
-const LoginPage: React.FC<LoginPageProps> = ({ onSubmit }) => {
-  const [email, setEmail] = useState('');
+const LoginPage: React.FC<LoginPageProps> = ({
+  onSubmit,
+  email: ownerEmail = '',
+  setupRequired = false,
+  error = '',
+}) => {
+  const [email, setEmail] = useState(ownerEmail);
   const [password, setPassword] = useState('');
+  const [confirmation, setConfirmation] = useState('');
+  const [localError, setLocalError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLocalError('');
+    if (setupRequired && password.length < 10) {
+      setLocalError('Пароль должен содержать не менее 10 символов.');
+      return;
+    }
+    if (setupRequired && password !== confirmation) {
+      setLocalError('Пароли не совпадают.');
+      return;
+    }
     setIsSubmitting(true);
 
     try {
@@ -24,44 +43,66 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSubmit }) => {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-950 px-6">
-      <section className="w-full max-w-md rounded-xl border border-gray-800 bg-gray-900 p-8 shadow-2xl">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10">
-            <LockKeyhole className="h-6 w-6 text-blue-400" />
-          </div>
-          <h1 className="text-2xl font-bold text-white">Вход в KVP</h1>
-          <p className="mt-2 text-sm text-gray-400">Врата в панель управления</p>
+    <main className="login-shell">
+      <section className="login-aside">
+        <div className="brand"><span className="brand-mark">K</span>KVP / CONTROL</div>
+        <div>
+          <div className="eyebrow">Kernel Validation Protocol</div>
+          <h1>Управляйте<br />системой.<br />Без шума.</h1>
+          <p>Единая консоль контроля локальной инфраструктуры, политик и операционных контуров.</p>
         </div>
-
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="mb-2 block text-sm text-gray-300">Электронная почта</span>
-            <span className="relative block">
-              <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+        <div className="signal"><span className="signal-dot" /> ЛОКАЛЬНЫЙ КОНТУР · ГОТОВ</div>
+      </section>
+      <section className="login-panel">
+        <div className="login-card">
+          <div className="eyebrow">Защищённый доступ</div>
+          <h2>Вход в консоль</h2>
+          <p className="muted">
+            {setupRequired ? 'Создайте локальный пароль владельца контура.' : 'Авторизация владельца контура.'}
+          </p>
+          <form onSubmit={handleSubmit}>
+          <label className="field">
+            Электронная почта
+            <span className="input-wrap">
+              <Mail size={18} />
               <input
                 type="email"
                 autoComplete="email"
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-gray-600 focus:border-blue-500"
-                placeholder="architect@example.com"
+                readOnly={Boolean(ownerEmail)}
               />
             </span>
           </label>
+          {setupRequired && (
+            <label className="field">
+              Подтверждение пароля
+              <span className="input-wrap">
+                <LockKeyhole size={18} />
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmation}
+                  onChange={(event) => setConfirmation(event.target.value)}
+                  placeholder="Повторите пароль"
+                />
+              </span>
+            </label>
+          )}
 
-          <label className="block">
-            <span className="mb-2 block text-sm text-gray-300">Пароль</span>
-            <span className="relative block">
-              <LockKeyhole className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-500" />
+          {(localError || error) && <p className="auth-error" role="alert">{localError || error}</p>}
+          <label className="field">
+            Пароль
+            <span className="input-wrap">
+              <LockKeyhole size={18} />
               <input
                 type="password"
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 py-3 pl-11 pr-4 text-white outline-none transition placeholder:text-gray-600 focus:border-blue-500"
                 placeholder="Введите пароль"
               />
             </span>
@@ -70,15 +111,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onSubmit }) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="primary"
           >
-            {isSubmitting ? 'Вход…' : 'Войти'}
+            {isSubmitting ? 'Проверка…' : setupRequired ? 'Создать профиль и войти' : 'Войти'}
           </button>
-        </form>
-
-        <p className="mt-8 text-center text-xs text-gray-600">
-          KVP Protocol v0.1 · Маяк: netcity888netcity@gmail.com
-        </p>
+          </form>
+          <p className="fineprint">DIRECTORMIRA · OWNER ARCHITECT · LOCAL CREDENTIAL</p>
+        </div>
       </section>
     </main>
   );

@@ -1,5 +1,10 @@
 # /admin — Мозг KVP
 
+> **Operational UI:** the production-shaped AutoAdmin application lives at
+> `D:\auto-admin`. Start its Launcher/Dashboard with
+> `powershell -ExecutionPolicy Bypass -File .\admin\open-operational-dashboard.ps1`.
+> See `docs/auto-admin-integration.md` for the integration boundary.
+
 Священная папка, содержащая панель управления реальностью.
 
 ## Содержание
