@@ -54,6 +54,7 @@ security policy, human authorization, or the status labels below.
 - [ADR-0006](adr/0006-kvp-is-platform-foundation.md): KVP is a NetCityOS foundation.
 - [ADR-0007](adr/0007-debian-first-appliance.md): ship an immutable Debian-first appliance.
 - [ADR-0008](adr/0008-closed-core-open-base.md): closed core over a compliant open base.
+- [ADR-0009](adr/0009-stable-boundaries.md): preserve stable KVP trust boundaries.
 
 ## Status labels
 
