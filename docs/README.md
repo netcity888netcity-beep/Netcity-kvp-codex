@@ -18,23 +18,24 @@ invariant.
    - [KVP Model Gateway MVP](model-gateway-mvp.md) — implemented provider contract, registry, and local-only policy.
 9. [Fleet management](fleet-management.md) — lifecycle and large-scale operations.
 10. [KVP system architecture](kvp-architecture.md) — protected protocol control plane.
-11. [Protocol lifecycle](protocol-lifecycle.md) — sessions, commands, retries, and errors.
-12. [Wire contract](wire-contract.md) — validation, typed commands, and compatibility.
-13. [Adapter contract](adapter-contract.md) — engine integration and capability model.
-14. [Authorization model](authorization-model.md) — principals, roles, and policy inputs.
-15. [Platform security model](platform-security-model.md) — appliance, browser, cloud, and recovery threats.
-16. [KVP security model](security-model.md) — protocol assets, threats, and invariants.
-17. [Workstation incident report](security-incident-2026-07-24.md) — local containment and administrator cleanup gate.
-18. [Attestation model](attestation-model.md) — precise claim and evidence levels.
-19. [Persistence model](persistence-model.md) — transactions, idempotency, and outbox.
-20. [Configuration](configuration.md) — production-safe startup and rotation.
-21. [Open-source compliance](open-source-compliance.md) — proprietary/OSS boundary.
-22. [Platform defensibility](platform-defensibility.md) — ecosystem and IP control points.
-23. [Audit and observability](audit-and-observability.md) — evidence without secret leakage.
-24. [NetCityOS platform roadmap](platform-roadmap.md) — appliance-to-Enterprise milestones.
-25. [KVP delivery roadmap](roadmap.md) — protocol milestones and exit criteria.
-26. [Architecture decision backlog](open-questions.md) — unresolved choices and gates.
-27. [IP protection package](ip/README.md) — patent, software, trademark, and know-how drafts for ООО «НетСити».
+11. [Том 3 — сетевой протокол](tom-3-network-protocol.md) — accepted transport boundary and M1 exit criteria.
+12. [Protocol lifecycle](protocol-lifecycle.md) — sessions, commands, retries, and errors.
+13. [Wire contract](wire-contract.md) — validation, typed commands, and compatibility.
+14. [Adapter contract](adapter-contract.md) — engine integration and capability model.
+15. [Authorization model](authorization-model.md) — principals, roles, and policy inputs.
+16. [Platform security model](platform-security-model.md) — appliance, browser, cloud, and recovery threats.
+17. [KVP security model](security-model.md) — protocol assets, threats, and invariants.
+18. [Workstation incident report](security-incident-2026-07-24.md) — local containment and administrator cleanup gate.
+19. [Attestation model](attestation-model.md) — precise claim and evidence levels.
+20. [Persistence model](persistence-model.md) — transactions, idempotency, and outbox.
+21. [Configuration](configuration.md) — production-safe startup and rotation.
+22. [Open-source compliance](open-source-compliance.md) — proprietary/OSS boundary.
+23. [Platform defensibility](platform-defensibility.md) — ecosystem and IP control points.
+24. [Audit and observability](audit-and-observability.md) — evidence without secret leakage.
+25. [NetCityOS platform roadmap](platform-roadmap.md) — appliance-to-Enterprise milestones.
+26. [KVP delivery roadmap](roadmap.md) — protocol milestones and exit criteria.
+27. [Architecture decision backlog](open-questions.md) — unresolved choices and gates.
+28. [IP protection package](ip/README.md) — patent, software, trademark, and know-how drafts for ООО «НетСити».
 
 ## Vision and project culture
 
