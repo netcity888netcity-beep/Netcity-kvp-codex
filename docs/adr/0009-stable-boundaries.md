@@ -23,6 +23,12 @@ strengthened or replaced only when the replacement preserves:
 Every replacement must explicitly answer: does it preserve the contract and
 trust boundary?
 
+## Application
+
+Before merge, the author and reviewer must confirm that the change conforms to
+this ADR. The answer to “does it violate a stable public contract or trust
+boundary?” must be “no”; otherwise an explicit, reviewed ADR is required.
+
 ## Consequences
 
 - Behavioural tests remain valid when in-memory storage is replaced with a

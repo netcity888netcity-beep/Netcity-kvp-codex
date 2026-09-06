@@ -20,6 +20,8 @@ Every pull request must state:
 - files and public contracts changed;
 - exact test commands and results;
 - security, privacy, compatibility, and rollback considerations;
+- ADR-0009 assessment: confirm that the change preserves public contracts and
+  trust boundaries, or describe the accepted ADR that changes them;
 - known limitations and intentionally skipped checks.
 
 Keep generated files, caches, build output, editor locks, databases, audit
@@ -49,6 +51,8 @@ evidence run pass. Report unavailable tooling as skipped with the reason.
 - bound queues, payloads, logs, state, timeouts, and retries;
 - avoid secret or personal data in logs and fixtures;
 - keep production claims no stronger than their automated evidence.
+- Do not merge a change that violates a stable contract or trust boundary
+  without an explicit, reviewed architecture decision.
 
 ## Commit and review hygiene
 
