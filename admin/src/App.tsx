@@ -17,6 +17,27 @@ export default function App() {
   const [humanState, setHumanState] = useState<KvpHumanState | null>(null);
   const [pairingError, setPairingError] = useState('');
   const [gatewayToken, setGatewayToken] = useState('');
+  const workspaceOnly = typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).get('workspace') === '1';
+  const workspaceSurface = typeof window !== 'undefined'
+    ? (new URLSearchParams(window.location.search).get('surface') === 'ops'
+      ? 'ops'
+      : new URLSearchParams(window.location.search).get('surface') === 'settings' ? 'settings' : 'studio')
+    : 'studio';
+
+  if (workspaceOnly) {
+    return (
+      <Dashboard
+        userName="Local Architect"
+        userRole="Workspace Operator"
+        userEmail={OWNER_PROFILE.email}
+        humanState={null}
+        gatewayStatus="verified"
+        initialPage={workspaceSurface}
+        onLogout={() => { window.location.href = '/'; }}
+      />
+    );
+  }
 
   const readProtectedState = async (token: string) => {
     try {

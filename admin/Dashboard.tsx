@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import {
   Bot, BrainCircuit, CheckCircle2, CircleUserRound, Cpu, FileKey2,
-  Fingerprint, HeartPulse, History, Link2, LockKeyhole, LogOut,
-  Menu, Network, Radio, ShieldCheck, WalletCards, X,
+  Fingerprint, Gauge, HeartPulse, History, Link2, LockKeyhole, LogOut,
+  Menu, Network, Radio, Settings2, ShieldCheck, WalletCards, Wand2, X,
 } from 'lucide-react';
 import type { KvpHumanState } from './src/gateway';
+import OpsDashboard from './src/OpsDashboard';
+import ModelStudio from './src/ModelStudio';
+import Settings from './src/Settings';
 
 interface DashboardProps {
   userName?: string;
@@ -13,6 +16,7 @@ interface DashboardProps {
   humanState?: KvpHumanState | null;
   gatewayStatus?: 'verified';
   onLogout?: () => void;
+  initialPage?: Page;
 }
 
 const offlineIdentity = {
@@ -22,15 +26,18 @@ const offlineIdentity = {
 };
 
 const pages = {
+  ops: ['Операционный HUD', 'Телеметрия станции, проектные инструменты и безопасная автоматизация.'],
+  studio: ['Model Studio', 'Альтернативная среда для моделей, ассистентов и программных векторов.'],
   home: ['Центр человека', 'Единое состояние протокола NetCity-KVP.'],
   passport: ['Цифровой паспорт', 'Идентичность, согласия и доверенные привязки.'],
   wallet: ['Внутренний счёт', 'Закрытый NCY ledger, связанный с KVP principal.'],
   assistants: ['Ассистенты', 'Делегированные помощники без владения идентичностью.'],
   bridges: ['Мосты', 'Добровольные интерфейсы устройств и исследовательских данных.'],
   evidence: ['Свидетельства', 'Локальный журнал состояний и границ доверия.'],
+  settings: ['Настройки', 'Провайдеры, API-ключи и границы внешних соединений.'],
 } as const;
 
-type Page = keyof typeof pages;
+export type Page = keyof typeof pages;
 
 const Dashboard: React.FC<DashboardProps> = ({
   userName = 'DirectorMira',
@@ -39,8 +46,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   humanState = null,
   gatewayStatus = 'verified',
   onLogout = () => {},
+  initialPage = 'ops',
 }) => {
-  const [page, setPage] = useState<Page>('home');
+  const [page, setPage] = useState<Page>(initialPage);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const [assistantEnabled, setAssistantEnabled] = useState(false);
@@ -55,12 +63,15 @@ const Dashboard: React.FC<DashboardProps> = ({
   const gatewayLabel = 'M2 SESSION VERIFIED';
 
   const nav = [
+    ['ops', 'Ops HUD', Gauge],
+    ['studio', 'Model Studio', Wand2],
     ['home', 'Центр', CircleUserRound],
     ['passport', 'Паспорт', Fingerprint],
     ['wallet', 'Кошелёк', WalletCards],
     ['assistants', 'Ассистенты', Bot],
     ['bridges', 'Мосты', BrainCircuit],
     ['evidence', 'Свидетельства', History],
+    ['settings', 'Настройки', Settings2],
   ] as const;
 
   const open = (next: Page) => {
@@ -116,7 +127,11 @@ const Dashboard: React.FC<DashboardProps> = ({
     <div className="evidence-list"><div><CheckCircle2 /><span><b>KVP sessions</b><small>expiry, revocation, replay ordering</small></span><code>TESTED</code></div><div><CheckCircle2 /><span><b>Identity registry</b><small>unique email, lifecycle, self-read isolation</small></span><code>TESTED</code></div><div><CheckCircle2 /><span><b>Payment ledger</b><small>identity binding, double entry, idempotency</small></span><code>TESTED</code></div><div><LockKeyhole /><span><b>Production transport</b><small>mTLS daemon and durable persistence</small></span><code>PLANNED</code></div><div><LockKeyhole /><span><b>BioLink / DNA bridge</b><small>no implemented or clinically validated capability</small></span><code>RESEARCH</code></div></div>
   </section>;
 
-  const content = { home: renderHome, passport: renderPassport, wallet: renderWallet, assistants: renderAssistants, bridges: renderBridges, evidence: renderEvidence }[page]();
+  const renderOps = () => <OpsDashboard />;
+  const renderStudio = () => <ModelStudio />;
+  const renderSettings = () => <Settings />;
+
+  const content = { ops: renderOps, studio: renderStudio, home: renderHome, passport: renderPassport, wallet: renderWallet, assistants: renderAssistants, bridges: renderBridges, evidence: renderEvidence, settings: renderSettings }[page]();
 
   return <div className="dashboard human-console">
     <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}><div className="side-brand brand"><span className="brand-mark">N</span>NETCITY–KVP</div><button aria-label="Закрыть меню" onClick={() => setSidebarOpen(false)} className="close"><X /></button><nav className="nav">{nav.map(([id, label, Icon]) => <button key={id} className={page === id ? 'active' : ''} onClick={() => open(id)}><Icon size={18} />{label}</button>)}</nav><button className="logout" onClick={onLogout}><LogOut size={18} />Завершить сеанс</button></aside>

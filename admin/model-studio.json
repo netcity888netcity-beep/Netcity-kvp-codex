@@ -1,0 +1,144 @@
+{
+  "version": 1,
+  "sensitive_data_policy": "local_only",
+  "providers": [
+    {
+      "id": "mock",
+      "label": "KVP Local Echo",
+      "kind": "mock",
+      "boundary": "local",
+      "endpoint": null,
+      "credential_env": null,
+      "enabled": true,
+      "models": ["mock/local-echo"]
+    },
+    {
+      "id": "ollama",
+      "label": "Ollama",
+      "kind": "ollama",
+      "boundary": "local",
+      "endpoint": "http://127.0.0.1:11434",
+      "credential_env": null,
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "lmstudio",
+      "label": "LM Studio",
+      "kind": "openai_compatible",
+      "boundary": "local",
+      "endpoint": "http://127.0.0.1:1234/v1",
+      "credential_env": null,
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "vllm",
+      "label": "vLLM / local OpenAI-compatible",
+      "kind": "openai_compatible",
+      "boundary": "local",
+      "endpoint": "http://127.0.0.1:8000/v1",
+      "credential_env": null,
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "openai",
+      "label": "OpenAI API",
+      "kind": "openai_responses",
+      "boundary": "remote",
+      "endpoint": "https://api.openai.com/v1",
+      "credential_env": "OPENAI_API_KEY",
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "openrouter",
+      "label": "OpenRouter",
+      "kind": "openai_compatible",
+      "boundary": "remote",
+      "endpoint": "https://openrouter.ai/api/v1",
+      "credential_env": "OPENROUTER_API_KEY",
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "github-models",
+      "label": "GitHub Models",
+      "kind": "openai_compatible",
+      "boundary": "remote",
+      "endpoint": "https://models.github.ai/inference",
+      "credential_env": "GITHUB_MODELS_TOKEN",
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "anthropic",
+      "label": "Anthropic API",
+      "kind": "anthropic",
+      "boundary": "remote",
+      "endpoint": "https://api.anthropic.com",
+      "credential_env": "ANTHROPIC_API_KEY",
+      "enabled": true,
+      "models": []
+    },
+    {
+      "id": "custom-openai",
+      "label": "Custom OpenAI-compatible",
+      "kind": "openai_compatible",
+      "boundary": "remote",
+      "endpoint": "https://api.example.com/v1",
+      "credential_env": "KVP_CUSTOM_API_KEY",
+      "enabled": false,
+      "models": []
+    }
+  ],
+  "modes": [
+    {
+      "id": "dialogue",
+      "label": "Диалог",
+      "description": "Быстрый разбор, вопросы и решения",
+      "system": "Ты — ясный технический собеседник. Отвечай по существу, уточняй риски и предлагай следующий проверяемый шаг."
+    },
+    {
+      "id": "architect",
+      "label": "Архитектор",
+      "description": "Системное мышление и границы доверия",
+      "system": "Ты — архитектор систем. Выделяй цели, контракты, границы доверия, зависимости и план валидации. Не выдавай предположения за факты."
+    },
+    {
+      "id": "coder",
+      "label": "Кодер",
+      "description": "Реализация, рефакторинг и отладка",
+      "system": "Ты — ведущий инженер. Предлагай минимальный рабочий патч, учитывай тесты, ошибки и обратную совместимость. Не запускай и не предлагай опасные команды без явного подтверждения."
+    },
+    {
+      "id": "reviewer",
+      "label": "Ревьюер",
+      "description": "Аудит качества и безопасности",
+      "system": "Ты — строгий code reviewer. Ищи ошибки, регрессии, утечки секретов, проблемы авторизации и тестового покрытия. Сначала указывай влияние и доказательство, затем исправление."
+    },
+    {
+      "id": "researcher",
+      "label": "Исследователь",
+      "description": "Сравнение подходов и техническая разведка",
+      "system": "Ты — исследователь. Разделяй подтверждённые сведения, выводы и неизвестное. Сравнивай альтернативы по надёжности, стоимости, задержке и риску."
+    },
+    {
+      "id": "orchestrator",
+      "label": "Оркестратор",
+      "description": "Декомпозиция в исполнимые векторы",
+      "system": "Ты — оркестратор программной работы. Разложи цель на независимые задачи, укажи входы, выходы, владельца, проверки и точку ручного подтверждения перед изменением системы."
+    }
+  ],
+  "vectors": [
+    { "id": "backend", "label": "Backend / API" },
+    { "id": "frontend", "label": "Frontend / UX" },
+    { "id": "protocol", "label": "KVP / Protocol" },
+    { "id": "security", "label": "Security / Audit" },
+    { "id": "infra", "label": "Infra / DevOps" },
+    { "id": "data-ai", "label": "Data / AI" },
+    { "id": "mobile", "label": "Mobile" },
+    { "id": "docs", "label": "Docs / Product" }
+  ]
+}

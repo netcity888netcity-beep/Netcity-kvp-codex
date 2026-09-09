@@ -3,7 +3,16 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "main": "electron/main.cjs",
   "scripts": {
+    "ops": "powershell -ExecutionPolicy Bypass -File ./start-ops-dashboard.ps1",
+    "ops:shortcut": "powershell -ExecutionPolicy Bypass -File ./install-ops-shortcut.ps1",
+    "desktop": "electron .",
+    "desktop:studio": "electron . -- --surface=studio",
+    "desktop:ops": "electron . -- --surface=ops",
+    "desktop:dist": "npm run desktop:portable",
+    "desktop:installer": "powershell -ExecutionPolicy Bypass -File ../tools/build-electron-installer.ps1",
+    "desktop:portable": "npm run build && node ../tools/package-electron-portable.cjs",
     "operational": "powershell -ExecutionPolicy Bypass -File ./open-operational-dashboard.ps1",
     "dev": "vite --host 127.0.0.1",
     "build": "tsc --noEmit && vite build",
@@ -11,14 +20,57 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
+    "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest"
+    "typescript": "latest",
+    "vite": "latest"
   },
   "devDependencies": {
     "@types/react": "latest",
-    "@types/react-dom": "latest"
+    "@types/react-dom": "latest",
+    "electron": "^44.3.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "net.netcity.kvp",
+    "productName": "NetCity KVP",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../tools/kvp-ops-server.ps1",
+        "to": "tools/kvp-ops-server.ps1"
+      },
+      {
+        "from": "../../kvp-security-audit.ps1",
+        "to": "kvp-security-audit.ps1"
+      },
+      {
+        "from": "model-studio.json",
+        "to": "admin/model-studio.json"
+      }
+    ],
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
+      ],
+      "artifactName": "NetCity-KVP-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "NetCity KVP"
+    }
   }
 }

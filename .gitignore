@@ -25,3 +25,5 @@ firebase-adminsdk*.json
 # публикуются в репозитории. Канонические версии находятся в docs/.
 /deepseek_markdown_*.md
 /*.docx
+/admin/release/
+/admin/release-installer/
