@@ -55,6 +55,8 @@ third-party cloud provider.
 - `docs/security-model.md` — security invariants and explicit claim limits.
 - `design/visual-references/` — visual reference lab, decomposition notes and
   derived design tokens for the enterprise interface.
+- `design/concepts/ar-hud-assistant-os/` — концепт-направление AR HUD,
+  Assistant Interface и System OS.
 
 ## Local development
 

@@ -4,6 +4,10 @@
 сохраняем картинки, а разбираем каждый образец на наблюдаемые составляющие и
 переводим их в правила интерфейса, design tokens и проверяемые React/CSS-задачи.
 
+Верхнее концептуальное направление интерфейса описано в
+[`design/concepts/ar-hud-assistant-os/`](../../design/concepts/ar-hud-assistant-os/):
+`AR HUD · Assistant Interface · System OS`.
+
 ## Структура
 
 | Папка | Назначение |
