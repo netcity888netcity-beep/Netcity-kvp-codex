@@ -62,16 +62,19 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
   const gatewayLabel = 'M2 SESSION VERIFIED';
 
-  const nav = [
-    ['ops', 'Ops HUD', Gauge],
-    ['studio', 'Model Studio', Wand2],
-    ['home', 'Центр', CircleUserRound],
-    ['passport', 'Паспорт', Fingerprint],
-    ['wallet', 'Кошелёк', WalletCards],
-    ['assistants', 'Ассистенты', Bot],
-    ['bridges', 'Мосты', BrainCircuit],
-    ['evidence', 'Свидетельства', History],
-    ['settings', 'Настройки', Settings2],
+  const navSections = [
+    {
+      label: 'ОПЕРАЦИОННЫЙ СЛОЙ',
+      items: [['ops', 'Ops HUD', Gauge], ['studio', 'Model Studio', Wand2], ['settings', 'Настройки', Settings2]],
+    },
+    {
+      label: 'ПРОТОКОЛ ЧЕЛОВЕКА',
+      items: [['home', 'Центр', CircleUserRound], ['passport', 'Паспорт', Fingerprint], ['wallet', 'Кошелёк', WalletCards], ['assistants', 'Ассистенты', Bot]],
+    },
+    {
+      label: 'ИССЛЕДОВАТЕЛЬСКИЙ КОНТУР',
+      items: [['bridges', 'Мосты', BrainCircuit], ['evidence', 'Свидетельства', History]],
+    },
   ] as const;
 
   const open = (next: Page) => {
@@ -134,9 +137,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   const content = { ops: renderOps, studio: renderStudio, home: renderHome, passport: renderPassport, wallet: renderWallet, assistants: renderAssistants, bridges: renderBridges, evidence: renderEvidence, settings: renderSettings }[page]();
 
   return <div className="dashboard human-console">
-    <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}><div className="side-brand brand"><span className="brand-mark">N</span>NETCITY–KVP</div><button aria-label="Закрыть меню" onClick={() => setSidebarOpen(false)} className="close"><X /></button><nav className="nav">{nav.map(([id, label, Icon]) => <button key={id} className={page === id ? 'active' : ''} onClick={() => open(id)}><Icon size={18} />{label}</button>)}</nav><button className="logout" onClick={onLogout}><LogOut size={18} />Завершить сеанс</button></aside>
+    <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}><div className="side-brand brand"><span className="brand-mark">N</span><span><b>NETCITY–KVP</b><small>CONTROL FABRIC · 01</small></span></div><button aria-label="Закрыть меню" onClick={() => setSidebarOpen(false)} className="close"><X /></button><nav className="nav">{navSections.map((section) => <div className="nav-section" key={section.label}><span className="nav-section-label">{section.label}</span>{section.items.map(([id, label, Icon]) => <button key={id} className={page === id ? 'active' : ''} onClick={() => open(id)}><Icon size={18} />{label}</button>)}</div>)}</nav><div className="sidebar-footprint"><span className="footprint-dot" /><span><b>LOCAL FABRIC</b><small>loopback / verified</small></span></div><button className="logout" onClick={onLogout}><LogOut size={18} />Завершить сеанс</button></aside>
     {sidebarOpen && <div className="overlay" onClick={() => setSidebarOpen(false)} />}
-    <main className="content"><header className="topbar"><div><button aria-label="Открыть меню" onClick={() => setSidebarOpen(true)} className="menu-toggle"><Menu /></button><div className="eyebrow">NETCITY–KVP · HUMAN PROTOCOL M1</div><h1>{pages[page][0]}</h1><p className="muted">{pages[page][1]}</p></div><div className="owner-block"><strong>{userName}</strong><span className={`gateway-state ${gatewayStatus}`}><i className="signal-dot" /> {gatewayLabel}</span><span>Identity {identity.status.toLowerCase()}</span></div></header>{notice && <div className="notice"><CheckCircle2 size={17} />{notice}<button onClick={() => setNotice('')}>×</button></div>}<div className="page-body">{content}</div></main>
+    <main className="content"><header className="topbar"><div><button aria-label="Открыть меню" onClick={() => setSidebarOpen(true)} className="menu-toggle"><Menu /></button><div className="eyebrow">NETCITY–KVP · HUMAN PROTOCOL M1</div><h1>{pages[page][0]}</h1><p className="muted">{pages[page][1]}</p></div><div className="owner-block"><div className="owner-identity"><CircleUserRound size={15} /><span><strong>{userName}</strong><small>{userRole}</small></span></div><span className={`gateway-state ${gatewayStatus}`}><i className="signal-dot" /> {gatewayLabel}</span><span className="owner-context"><b>WORKSPACE</b> NETCITY-KVP / LOCAL</span></div></header>{notice && <div className="notice"><CheckCircle2 size={17} />{notice}<button onClick={() => setNotice('')}>×</button></div>}<div className="page-body">{content}</div></main>
   </div>;
 };
 
