@@ -103,3 +103,15 @@ and blocks navigation to non-local URLs.
 For a user-local installer, use `npm run desktop:installer` on a Windows build
 host with Inno Setup available. The installer creates both desktop shortcuts
 and an ordinary per-user uninstaller.
+
+## GitHub deployment
+
+GitHub stores the source and can build distributable Windows artifacts through
+`.github/workflows/desktop-release.yml`. Run it manually from the Actions tab
+for a CI artifact, or push a tag such as `v0.1.1` to publish a GitHub Release
+with `NetCity-KVP-portable.zip` and the per-user installer.
+
+This is not a GitHub Pages application: the full product needs Electron and a
+local PowerShell gateway for workstation telemetry and provider credentials.
+Real provider calls use the keys configured in the desktop Settings page; CI
+does not send mock or provider API requests.

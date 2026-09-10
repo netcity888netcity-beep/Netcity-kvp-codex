@@ -1,0 +1,72 @@
+name: Build NetCity KVP desktop
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install Admin dependencies
+        run: npm ci --prefix admin
+
+      - name: Verify Rust workspace
+        run: cargo test --workspace
+
+      - name: Build Admin UI
+        run: npm run build --prefix admin
+
+      - name: Package portable Electron runtime
+        run: npm run desktop:portable --prefix admin
+
+      - name: Create portable archive
+        shell: pwsh
+        run: Compress-Archive -Path admin/release/* -DestinationPath NetCity-KVP-portable.zip -CompressionLevel Optimal
+
+      - name: Install Inno Setup
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Build per-user installer
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        run: powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools/build-electron-installer.ps1
+
+      - name: Upload CI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: netcity-kvp-windows
+          if-no-files-found: error
+          path: |
+            NetCity-KVP-portable.zip
+            admin/release-installer/NetCity-KVP-Setup-*.exe
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$env:GITHUB_REF_NAME" `
+            NetCity-KVP-portable.zip `
+            admin/release-installer/NetCity-KVP-Setup-*.exe `
+            --generate-notes `
+            --title "NetCity KVP $env:GITHUB_REF_NAME"
