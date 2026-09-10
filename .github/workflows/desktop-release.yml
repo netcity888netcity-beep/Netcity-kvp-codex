@@ -36,6 +36,20 @@ jobs:
       - name: Build Admin UI
         run: npm run build --prefix admin
 
+      - name: Verify Electron runtime
+        shell: pwsh
+        run: |
+          $electronRoot = Join-Path $env:GITHUB_WORKSPACE 'admin/node_modules/electron/dist'
+          if (-not (Test-Path (Join-Path $electronRoot 'electron.exe'))) {
+            Write-Host 'Electron binary was not present after npm ci; running the official installer script.'
+            node admin/node_modules/electron/install.js
+          }
+          if (-not (Test-Path (Join-Path $electronRoot 'electron.exe'))) {
+            Get-ChildItem admin/node_modules/electron -Force | Format-List
+            throw 'Electron runtime is missing from the Windows build environment.'
+          }
+          & admin/node_modules/.bin/electron.cmd --version
+
       - name: Package portable Electron runtime
         run: npm run desktop:portable --prefix admin
 
