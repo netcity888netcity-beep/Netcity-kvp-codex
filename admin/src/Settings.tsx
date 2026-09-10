@@ -83,7 +83,7 @@ export default function Settings() {
     try {
       const value = await readStudioCatalog();
       setCatalog(value);
-      if (!value.providers.some((provider) => provider.id === providerId)) setProviderId(value.providers[0]?.id ?? 'mock');
+      if (!value.providers.some((provider) => provider.id === providerId)) setProviderId(value.providers[0]?.id ?? 'openai');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Не удалось загрузить настройки провайдеров.');
     } finally {

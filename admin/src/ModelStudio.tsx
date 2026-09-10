@@ -19,7 +19,6 @@ import {
   ScanSearch,
   Settings2,
   ShieldCheck,
-  Sparkles,
   TerminalSquare,
   Wand2,
   XCircle,
@@ -62,7 +61,6 @@ function readyProviderLabel(count: number): string {
 }
 
 function ProviderGlyph({ kind }: { kind: string }) {
-  if (kind === 'mock') return <Sparkles size={17} />;
   if (kind === 'ollama') return <Cpu size={17} />;
   if (kind === 'anthropic') return <Wand2 size={17} />;
   if (kind === 'openai_responses') return <Bot size={17} />;
@@ -107,8 +105,8 @@ export default function ModelStudio() {
   const [catalog, setCatalog] = useState<StudioCatalog | null>(null);
   const [loading, setLoading] = useState(true);
   const [catalogError, setCatalogError] = useState('');
-  const [providerId, setProviderId] = useState('mock');
-  const [modelId, setModelId] = useState('mock/local-echo');
+  const [providerId, setProviderId] = useState('openai');
+  const [modelId, setModelId] = useState('');
   const [modeId, setModeId] = useState('coder');
   const [vectorId, setVectorId] = useState('backend');
   const [vectorNote, setVectorNote] = useState('');
@@ -126,7 +124,7 @@ export default function ModelStudio() {
       const value = await readStudioCatalog(signal);
       setCatalog(value);
       setCatalogError('');
-      if (!value.providers.some((provider) => provider.id === providerId)) setProviderId(value.providers[0]?.id ?? 'mock');
+      if (!value.providers.some((provider) => provider.id === providerId)) setProviderId(value.providers[0]?.id ?? 'openai');
       if (!value.modes.some((mode) => mode.id === modeId)) setModeId(value.modes[0]?.id ?? 'dialogue');
       if (!value.vectors.some((vector) => vector.id === vectorId)) setVectorId(value.vectors[0]?.id ?? 'backend');
     } catch (cause) {

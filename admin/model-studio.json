@@ -3,16 +3,6 @@
   "sensitive_data_policy": "local_only",
   "providers": [
     {
-      "id": "mock",
-      "label": "KVP Local Echo",
-      "kind": "mock",
-      "boundary": "local",
-      "endpoint": null,
-      "credential_env": null,
-      "enabled": true,
-      "models": ["mock/local-echo"]
-    },
-    {
       "id": "ollama",
       "label": "Ollama",
       "kind": "ollama",
