@@ -6,8 +6,13 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $adminRoot = Join-Path $repoRoot 'admin'
 $nodePath = (Get-Command node.exe -ErrorAction SilentlyContinue).Source
 if (-not $nodePath) { $nodePath = 'C:\Program Files\nodejs\node.exe' }
-$npmCli = 'C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js'
-if (-not (Test-Path -LiteralPath $nodePath -PathType Leaf) -or -not (Test-Path -LiteralPath $npmCli -PathType Leaf)) {
+$npmPath = (Get-Command npm.cmd -ErrorAction SilentlyContinue).Source
+if (-not $npmPath -and (Test-Path -LiteralPath $nodePath -PathType Leaf)) {
+    $npmPath = Join-Path (Split-Path -Parent $nodePath) 'npm.cmd'
+}
+$nodeReady = [bool]$nodePath -and (Test-Path -LiteralPath $nodePath -PathType Leaf)
+$npmReady = [bool]$npmPath -and (Test-Path -LiteralPath $npmPath -PathType Leaf)
+if (-not $nodeReady -or -not $npmReady) {
     throw 'Node.js/npm was not found. Install Node.js LTS before creating the installer.'
 }
 
@@ -24,7 +29,7 @@ if (-not $iscc) { throw 'Inno Setup compiler (ISCC.exe) was not found.' }
 
 Push-Location $adminRoot
 try {
-    & $nodePath $npmCli run build
+    & $npmPath run build
     & $nodePath (Join-Path $repoRoot 'tools\package-electron-portable.cjs')
     & $iscc (Join-Path $adminRoot 'installer\netcity-kvp.iss')
     $installer = Join-Path $adminRoot 'release-installer\NetCity-KVP-Setup-0.1.0.exe'

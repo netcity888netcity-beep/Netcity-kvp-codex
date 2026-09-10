@@ -27,6 +27,9 @@ jobs:
       - name: Install Admin dependencies
         run: npm ci --prefix admin
 
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Verify Rust workspace
         run: cargo test --workspace
 
