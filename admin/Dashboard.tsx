@@ -114,7 +114,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const renderAssistants = () => <section className="protocol-panel">
     <div className="panel-heading"><span className="human-icon"><Bot /></span><div><h2>Контур ассистентов</h2><p>Помощник действует только в пределах явно выданных capabilities.</p></div><span className={`state-chip ${assistantEnabled ? 'good' : ''}`}>{assistantEnabled ? 'LOCAL' : 'OFF'}</span></div>
-    <div className="assistant-card"><Cpu /><div><strong>NetCity Local Assistant</strong><p>Mock/local режим, inference и внешние providers отключены.</p><div className="capabilities"><span>status.read</span><span>identity.self.read</span><span className="denied">wallet.transfer ×</span><span className="denied">bridge.activate ×</span></div></div><button className="secondary-action" onClick={() => { setAssistantEnabled((value) => !value); setNotice('Локальный статус ассистента изменён. Внешний inference не выполнялся.'); }}>{assistantEnabled ? 'Отключить' : 'Включить локально'}</button></div>
+    <div className="assistant-card"><Cpu /><div><strong>NetCity Local Assistant</strong><p>Локальный control plane. Внешний inference запускается только через настроенный провайдер.</p><div className="capabilities"><span>status.read</span><span>identity.self.read</span><span className="denied">wallet.transfer ×</span><span className="denied">bridge.activate ×</span></div></div><button className="secondary-action" onClick={() => { setAssistantEnabled((value) => !value); setNotice('Локальный статус ассистента изменён. Внешний inference не выполнялся.'); }}>{assistantEnabled ? 'Отключить' : 'Включить локально'}</button></div>
   </section>;
 
   const renderBridges = () => <section className="protocol-panel">

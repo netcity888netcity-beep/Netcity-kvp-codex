@@ -174,7 +174,7 @@ export default function OpsDashboard({ onExit }: OpsDashboardProps) {
           <p>Телеметрия, инструменты и автоматизация проекта на одном локальном слое.</p>
         </div>
         <div className="ops-command-actions">
-          <span className={`ops-live ${error ? 'offline' : 'online'}`}><i />{error ? 'BRIDGE OFFLINE' : 'LIVE · 5 SEC'}</span>
+          <span className={`ops-live ${error ? 'offline' : 'online'}`}><i />{error ? 'BRIDGE OFFLINE' : 'LIVE · 12 SEC'}</span>
           <button className="ops-icon-button" onClick={() => void refresh()} aria-label="Обновить телеметрию" data-tooltip="Обновить телеметрию">
             <RefreshCw size={17} className={loading ? 'ops-spin' : ''} />
           </button>
