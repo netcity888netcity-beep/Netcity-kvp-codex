@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "purpose": "NetCity KVP visual reference and decomposition registry",
+  "statuses": ["inbox", "approved", "breakdown", "implemented", "archived"],
+  "references": []
+}

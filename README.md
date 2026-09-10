@@ -53,6 +53,8 @@ third-party cloud provider.
 - `docs/adapter-contract.md` — normalized engine integration contract;
 - `docs/persistence-model.md` — durable command and audit state;
 - `docs/security-model.md` — security invariants and explicit claim limits.
+- `design/visual-references/` — visual reference lab, decomposition notes and
+  derived design tokens for the enterprise interface.
 
 ## Local development
 
