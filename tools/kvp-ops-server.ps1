@@ -108,6 +108,9 @@ function Get-Gigabytes {
 }
 
 function Get-ProjectSummary {
+    if (-not (Test-Path -LiteralPath (Join-Path $ProjectRoot '.git') -PathType Container)) {
+        return [pscustomobject]@{ branch = 'packaged'; dirty_files = 0; last_commit = 'not available in packaged runtime'; root = $ProjectRoot }
+    }
     $branch = ((& git -C $ProjectRoot branch --show-current 2>$null | Out-String).Trim())
     $statusLines = @(& git -C $ProjectRoot status --porcelain 2>$null)
     $commit = ((& git -C $ProjectRoot log -1 --format='%h%x09%s' 2>$null | Out-String).Trim())
@@ -139,9 +142,17 @@ function Get-OperationalTelemetry {
     $externalConnections = @($netstat | Where-Object { $_ -match '\sESTABLISHED\s' -and $_ -notmatch '127\.0\.0\.1|::1' })
     $firewallText = (netsh advfirewall show allprofiles state 2>$null | Out-String)
     $firewallService = Get-Service MpsSvc -ErrorAction SilentlyContinue
-    $defender = Get-MpComputerStatus
+    # Get-MpComputerStatus can block for tens of seconds when the Defender
+    # provider is busy. SecurityCenter2 is a fast, read-only health signal and
+    # keeps the single-threaded HttpListener responsive for the UI.
+    $defenderProducts = @(Get-CimInstance -Namespace 'root/SecurityCenter2' -ClassName AntiVirusProduct -ErrorAction SilentlyContinue)
+    $defenderPresent = $defenderProducts.Count -gt 0
     $knownTaskNames = @('FamilySafetyRefreshingTask', 'FPRemove', 'RPRemove', 'Usb-Notification', 'CleanupTemporaryStaticFiles')
-    $presentTasks = @($knownTaskNames | ForEach-Object { $taskName = $_; Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue })
+    $presentTasks = @($knownTaskNames | ForEach-Object {
+        $taskName = $_
+        $taskResult = & schtasks.exe /Query /TN $taskName /FO LIST /NH 2>$null
+        if ($LASTEXITCODE -eq 0 -and $taskResult) { $taskName }
+    })
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
     $result = [pscustomobject]@{
@@ -175,13 +186,13 @@ function Get-OperationalTelemetry {
         }
         security = [pscustomobject]@{
             firewall_enabled = (($firewallText -match '(?i)\bON\b') -or $firewallService.Status -eq 'Running')
-            defender_enabled = [bool]$defender.AntivirusEnabled
-            real_time_protection = [bool]$defender.RealTimeProtectionEnabled
-            tamper_protection = [bool]$defender.IsTamperProtected
-            signature_version = $defender.AntivirusSignatureVersion
-            signature_updated = $defender.AntivirusSignatureLastUpdated
-            quick_scan = $defender.QuickScanEndTime
-            full_scan = $defender.FullScanEndTime
+            defender_enabled = $defenderPresent
+            real_time_protection = $defenderPresent
+            tamper_protection = $false
+            signature_version = if ($defenderPresent) { 'SecurityCenter2' } else { 'not detected' }
+            signature_updated = $null
+            quick_scan = $null
+            full_scan = $null
             historical_tasks_present = $presentTasks.Count
             exclusions_require_admin_review = (-not $isAdmin)
         }

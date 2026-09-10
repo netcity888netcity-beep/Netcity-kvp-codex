@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity,
   AlertTriangle,
@@ -100,8 +100,13 @@ export default function OpsDashboard({ onExit }: OpsDashboardProps) {
   const [error, setError] = useState('');
   const [runningAction, setRunningAction] = useState<string | null>(null);
   const [lastResult, setLastResult] = useState<OpsActionResult | null>(null);
+  const refreshInFlight = useRef(false);
 
   const refresh = useCallback(async (signal?: AbortSignal) => {
+    // Telemetry collection can take several seconds on Windows. Never queue
+    // overlapping requests on the single-threaded local gateway.
+    if (refreshInFlight.current) return;
+    refreshInFlight.current = true;
     try {
       const value = await readOpsTelemetry(signal);
       setTelemetry(value);
@@ -111,6 +116,7 @@ export default function OpsDashboard({ onExit }: OpsDashboardProps) {
       if (cause instanceof DOMException && cause.name === 'AbortError') return;
       setError(cause instanceof Error ? cause.message : 'Локальный ops-сервис недоступен.');
     } finally {
+      refreshInFlight.current = false;
       setLoading(false);
     }
   }, []);
@@ -118,7 +124,7 @@ export default function OpsDashboard({ onExit }: OpsDashboardProps) {
   useEffect(() => {
     const controller = new AbortController();
     void refresh(controller.signal);
-    const interval = window.setInterval(() => { void refresh(); }, 5000);
+    const interval = window.setInterval(() => { void refresh(); }, 12000);
     return () => {
       controller.abort();
       window.clearInterval(interval);
