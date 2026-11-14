@@ -85,12 +85,7 @@ impl KvpClient {
         };
 
         let response = futures::executor::block_on(self.transport.execute(command))?;
-
-        if response.status {
-            Ok(())
-        } else {
-            Err(KvError::TransportError(response.error_message))
-        }
+        response.into_result()
     }
 }
 

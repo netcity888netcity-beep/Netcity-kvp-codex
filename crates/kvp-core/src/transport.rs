@@ -25,6 +25,14 @@ impl CommandResponse {
             error_message: error_message.into(),
         }
     }
+
+    pub fn into_result(self) -> Result<(), KvError> {
+        if self.status {
+            Ok(())
+        } else {
+            Err(KvError::TransportError(self.error_message))
+        }
+    }
 }
 
 pub trait Transport: Send + Sync {
