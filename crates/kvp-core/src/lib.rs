@@ -4,6 +4,7 @@ pub mod auth;
 pub mod command;
 pub mod evidence;
 pub mod session;
+pub mod transport;
 
 use std::{
     collections::HashMap,

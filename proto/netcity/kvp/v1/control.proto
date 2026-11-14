@@ -149,3 +149,26 @@ message AttestationEvidence {
   bytes signature = 4;
   string signing_key_id = 5;
 }
+
+service KvpControl {
+  rpc Execute(CommandRequest) returns (CommandResponse);
+}
+
+enum Action {
+  ACTION_UNSPECIFIED = 0;
+  ACTION_CREATE_FLEET = 1;
+  ACTION_EXECUTE_COMMAND = 2;
+  ACTION_READ_STATUS = 3;
+}
+
+message CommandRequest {
+  string session_id = 1;
+  string client_id = 2;
+  uint64 sequence = 3;
+  Action action = 4;
+}
+
+message CommandResponse {
+  bool status = 1;
+  string error_message = 2;
+}
