@@ -3,6 +3,7 @@
 pub mod auth;
 pub mod command;
 pub mod evidence;
+pub mod mock_transport;
 pub mod session;
 pub mod transport;
 

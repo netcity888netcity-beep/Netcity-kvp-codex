@@ -13,6 +13,7 @@ pub enum KvError {
     ClientMismatch,
     SequenceError,
     Forbidden,
+    TransportError(String),
 }
 
 impl fmt::Display for KvError {
@@ -23,6 +24,7 @@ impl fmt::Display for KvError {
             Self::ClientMismatch => f.write_str("client id does not match the session binding"),
             Self::SequenceError => f.write_str("command sequence number overflow"),
             Self::Forbidden => f.write_str("operation is not permitted for this role"),
+            Self::TransportError(message) => write!(f, "transport error: {message}"),
         }
     }
 }
