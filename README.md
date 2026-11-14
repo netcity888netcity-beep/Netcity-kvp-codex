@@ -1,5 +1,7 @@
 # NetCityOS
 
+![Tests: 35 passed](https://img.shields.io/badge/tests-35%20passed-brightgreen)
+
 > **Builders wanted:** read the evidence-driven [open call](BUILDERS_CALL.md),
 > [contribution guide](CONTRIBUTING.md), and [security policy](SECURITY.md).
 
@@ -11,6 +13,9 @@ for clean hardware or a dedicated virtual machine.
 KVP (Kernel Validation Protocol) is the protected control and evidence fabric at
 the foundation of NetCityOS. Architect OS compiles versioned architecture graphs,
 and the Enterprise Workspace provides the operator environment.
+
+> **KVP philosophy:** A kernel-level validation protocol for secure,
+> evidence-based control of AI model fleets.
 
 ## Product boundaries
 
@@ -37,6 +42,29 @@ KV-cache memory through a public vLLM API, or replace TLS with proprietary
 cryptography. NetCityOS does not claim that KVP controls the internal state of a
 third-party cloud provider.
 
+## Architecture
+
+The KVP core is a layered, transport-independent control pipeline:
+
+```text
+KvpEngine (Orchestrator)
+        │  advances the monotonic sequence, delegates validation
+        ▼
+CommandProcessor (Validator)
+   ├── SessionManager (TTL, Client Binding)
+   ├── Authorization (RBAC)
+   └── EvidenceManager (Audit Log)
+        │  only authorized, validated commands continue
+        ▼
+Transport (Network Layer)
+   └── Box<dyn Transport> → MockTransport today, gRPC + mTLS next
+```
+
+`KvpEngine` is the composition root. It binds a session to a client, advances the
+sequence, asks `CommandProcessor` to validate and audit the command, and only
+then sends the command through the object-safe transport. Policy, session state,
+and the network boundary remain independently replaceable.
+
 ## Repository layout
 
 - `docs/architecture.md` — NetCityOS platform architecture;
@@ -46,7 +74,8 @@ third-party cloud provider.
 - `docs/model-tool-fabric.md` — local/cloud model and tool connectors;
 - `docs/ip/README.md` — confidential IP protection working package;
 - `proto/netcity/kvp/v1/control.proto` — versioned KVP wire contract;
-- `crates/kvp-core` — transport-independent session and authorization logic;
+- `crates/kvp-core` — sessions, RBAC, command validation, audit evidence, engine,
+  and transport abstraction;
 - `docs/README.md` — documentation map and architecture decision index;
 - `docs/kvp-architecture.md` — KVP components and trust boundaries;
 - `docs/protocol-lifecycle.md` — session and command semantics;
@@ -60,9 +89,9 @@ third-party cloud provider.
 
 ## Local development
 
-Prerequisites: stable Rust. The current milestone tests the domain layer and does
-not compile protobuf yet; protocol code generation is added with the gRPC server
-in the next milestone.
+Prerequisites: stable Rust. The current milestone covers the in-process KVP
+domain layer and the protobuf contract; the hardened mTLS gRPC server is the
+next milestone.
 
 ```text
 cargo test --workspace
