@@ -1,5 +1,10 @@
 #![forbid(unsafe_code)]
 
+pub mod auth;
+pub mod command;
+pub mod evidence;
+pub mod session;
+
 use std::{
     collections::HashMap,
     fmt,
