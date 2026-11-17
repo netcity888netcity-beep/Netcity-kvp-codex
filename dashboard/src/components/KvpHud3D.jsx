@@ -15,6 +15,7 @@ import {
   Edges,
 } from '@react-three/drei';
 import * as THREE from 'three';
+import { isPortraitSize, portraitDomFit, portraitTargets, pxToWorld } from '../spatial/layout.js';
 import { ParamField } from './ParamField';
 import { ModelRoute } from './ModelRoute';
 import { CitizenContext } from './CitizenContext';
@@ -32,157 +33,6 @@ const GLASS_CLASSES = {
 };
 
 const PLANE_Z = { focal: 40, mid: 24, far: 12 };
-
-/* ---------- ПОРТРЕТ: вертикальная стопка слоёв вокруг ЯДРО ---------- */
-const PORTRAIT_DOM = { focal: 0.7, mid: 0.45, far: 0.32 };
-const PORTRAIT_TOP = 64;
-const PORTRAIT_BOTTOM = 72;
-
-function isPortraitSize(w, h) {
-  return w < h * 1.05;
-}
-
-/* Распределение mid-слоёв над/под фокусом с балансировкой высот */
-function stackGroups(focusedId) {
-  const fi = AR_LAYERS.findIndex((l) => l.id === focusedId);
-  const mids = [];
-  const fars = [];
-  AR_LAYERS.forEach((l, i) => {
-    if (i === fi) return;
-    if (Math.abs(i - fi) <= 2) mids.push(l);
-    else fars.push(l);
-  });
-  const topPair = fars.slice(0, 2);
-  const botPair = fars.slice(2);
-  const topH = topPair.length ? 240 * PORTRAIT_DOM.far : 0;
-  const botH = botPair.length ? 240 * PORTRAIT_DOM.far : 0;
-  const above = [];
-  const below = [];
-  let sa = 0;
-  let sb = 0;
-  mids.forEach((l) => {
-    const hh = 330 * PORTRAIT_DOM.mid;
-    if (sa + topH <= sb + botH) {
-      above.push(l);
-      sa += hh;
-    } else {
-      below.push(l);
-      sb += hh;
-    }
-  });
-  return { above, below, topPair, botPair };
-}
-
-/* Общий масштаб DOM-панелей, чтобы вся стопка влезала между header и nav */
-function portraitDomFit(H, slotRegistry, focusedId) {
-  const { above, below, topPair, botPair } = stackGroups(focusedId);
-  const chOf = (id, def) => {
-    const s = slotRegistry && slotRegistry.current[id];
-    return (s && s.ch) || def;
-  };
-  let sum = chOf(focusedId, 400) * PORTRAIT_DOM.focal;
-  above.forEach((l) => (sum += chOf(l.id, 330) * PORTRAIT_DOM.mid));
-  below.forEach((l) => (sum += chOf(l.id, 330) * PORTRAIT_DOM.mid));
-  if (topPair.length)
-    sum += Math.max(...topPair.map((l) => chOf(l.id, 240))) * PORTRAIT_DOM.far;
-  if (botPair.length)
-    sum += Math.max(...botPair.map((l) => chOf(l.id, 240))) * PORTRAIT_DOM.far;
-  const blocks =
-    (topPair.length ? 1 : 0) +
-    above.length +
-    1 +
-    below.length +
-    (botPair.length ? 1 : 0);
-  const gap = Math.max(8, H * 0.012);
-  const total = sum + Math.max(0, blocks - 1) * gap;
-  const usable = Math.max(240, H - PORTRAIT_TOP - PORTRAIT_BOTTOM);
-  return Math.min(1, (usable * 0.99) / total);
-}
-
-/* Целевые экранные позиции (px) всех слоёв в портрете */
-function portraitTargets(focusedId, W, H, slotRegistry) {
-  const fit = portraitDomFit(H, slotRegistry, focusedId);
-  const domF = PORTRAIT_DOM.focal * fit;
-  const domM = PORTRAIT_DOM.mid * fit;
-  const domR = PORTRAIT_DOM.far * fit;
-  const gap = Math.max(8, H * 0.012);
-  const { above, below, topPair, botPair } = stackGroups(focusedId);
-  const chOf = (id, def) => {
-    const s = slotRegistry.current[id];
-    return (s && s.ch) || def;
-  };
-  const cwOf = (id, def) => {
-    const s = slotRegistry.current[id];
-    return (s && s.cw) || def;
-  };
-  const hF = chOf(focusedId, 400) * domF;
-  const hAbove = above.map((l) => chOf(l.id, 330) * domM);
-  const hBelow = below.map((l) => chOf(l.id, 330) * domM);
-  const hTop = topPair.length
-    ? Math.max(...topPair.map((l) => chOf(l.id, 240))) * domR
-    : 0;
-  const hBot = botPair.length
-    ? Math.max(...botPair.map((l) => chOf(l.id, 240))) * domR
-    : 0;
-  const wTop = topPair.length
-    ? Math.max(...topPair.map((l) => cwOf(l.id, 330))) * domR
-    : 0;
-  const wBot = botPair.length
-    ? Math.max(...botPair.map((l) => cwOf(l.id, 330))) * domR
-    : 0;
-  const blocks =
-    (topPair.length ? 1 : 0) +
-    above.length +
-    1 +
-    below.length +
-    (botPair.length ? 1 : 0);
-  const total =
-    hTop +
-    hAbove.reduce((a, b) => a + b, 0) +
-    hF +
-    hBelow.reduce((a, b) => a + b, 0) +
-    hBot +
-    Math.max(0, blocks - 1) * gap;
-  const usable = Math.max(240, H - PORTRAIT_TOP - PORTRAIT_BOTTOM);
-  let y = PORTRAIT_TOP + Math.max(0, (usable - total) / 2);
-  const cx = W / 2;
-  const out = {};
-  if (topPair.length) {
-    const ty = y + hTop / 2;
-    const off = wTop / 2 + gap / 2;
-    if (topPair[0]) out[topPair[0].id] = { x: cx - off, y: ty };
-    if (topPair[1]) out[topPair[1].id] = { x: cx + off, y: ty };
-    y += hTop + gap;
-  }
-  above.forEach((l, i) => {
-    out[l.id] = { x: cx, y: y + hAbove[i] / 2 };
-    y += hAbove[i] + gap;
-  });
-  out[focusedId] = { x: cx, y: y + hF / 2 };
-  y += hF + gap;
-  below.forEach((l, i) => {
-    out[l.id] = { x: cx, y: y + hBelow[i] / 2 };
-    y += hBelow[i] + gap;
-  });
-  if (botPair.length) {
-    const by = y + hBot / 2;
-    const off = wBot / 2 + gap / 2;
-    if (botPair[0]) out[botPair[0].id] = { x: cx - off, y: by };
-    if (botPair[1]) out[botPair[1].id] = { x: cx + off, y: by };
-  }
-  return out;
-}
-
-/* Экранные px → мировые единицы Three.js (с учётом перспективы камеры) */
-function pxToWorld(pxX, pxY, zObj, camera, size) {
-  const d = camera.position.z - zObj;
-  const tanHalf = Math.tan((camera.fov * Math.PI) / 360);
-  const halfH = d * tanHalf;
-  const aspect = size.width / size.height;
-  const ndcX = (pxX - size.width / 2) / (size.width / 2);
-  const ndcY = (size.height / 2 - pxY) / (size.height / 2);
-  return [ndcX * halfH * aspect, ndcY * halfH];
-}
 
 function supportsWebGL() {
   try {
@@ -288,6 +138,7 @@ function LayerNode({
         size.width,
         size.height,
         slotRegistry,
+        AR_LAYERS,
       );
       const target = targets[layer.id];
       const [twx, twy] = pxToWorld(
@@ -500,7 +351,7 @@ export function KvpHud3D() {
     const W = window.innerWidth;
     const H = window.innerHeight;
     const portrait = isPortraitSize(W, H);
-    const fit = () => portraitDomFit(H, slotRegistry, focusedId);
+    const fit = () => portraitDomFit(H, slotRegistry, focusedId, AR_LAYERS);
     if (layer.id === focusedId) {
       return portrait
         ? { ...PLANE_FOCAL, dom: PORTRAIT_DOM.focal * fit() }
