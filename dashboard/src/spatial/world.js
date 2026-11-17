@@ -23,8 +23,10 @@ export function createWorldScene({
     return [instance.id, instance];
   })));
   for (const node of Object.values(scene.nodes)) {
-    if (node.geometryId && !geometryLibrary[node.geometryId]) throw new Error('geometry not found for node ' + node.id + ': ' + node.geometryId);
-    if (node.materialId && !materialLibrary[node.materialId]) throw new Error('material not found for node ' + node.id + ': ' + node.materialId);
+    const geometryId = node.metadata?.geometryId;
+    const materialId = node.metadata?.materialId;
+    if (geometryId && !geometryLibrary[geometryId]) throw new Error('geometry not found for node ' + node.id + ': ' + geometryId);
+    if (materialId && !materialLibrary[materialId]) throw new Error('material not found for node ' + node.id + ': ' + materialId);
   }
   const lightEnvironment = lighting.lights
     ? createLightingEnvironment(lighting)
