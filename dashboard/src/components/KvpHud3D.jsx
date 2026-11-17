@@ -16,10 +16,30 @@ import {
 } from '@react-three/drei';
 import * as THREE from 'three';
 import { dampingFactor, isPortraitSize, PORTRAIT_DOM, portraitDomFit, portraitTargets, pxToWorld } from '../spatial/layout.js';
+import { composeSpatialScene } from '../spatial/compositor.js';
+import {
+  WORLD_STORAGE_KEY,
+  enterLayer,
+  restoreWorld,
+  serializeWorld,
+  worldTheme,
+  worldToScene,
+} from '../spatial/world.js';
 import { ParamField } from './ParamField';
 import { ModelRoute } from './ModelRoute';
 import { CitizenContext } from './CitizenContext';
+import { SpatialObjectNode } from './SpatialObject.jsx';
 import { AR_LAYERS, KvpHud as KvpHudCSS } from './KvpHud';
+
+const LAYER_IDS = new Set(AR_LAYERS.map((layer) => layer.id));
+
+function readStoredWorld() {
+  try {
+    return window.localStorage.getItem(WORLD_STORAGE_KEY);
+  } catch (e) {
+    return null;
+  }
+}
 
 /* Геометрия пространственных планов (единицы Three.js, камера z=7, fov 42) */
 const PLANE_FOCAL = { key: 'focal', z: 0.9, dom: 1, w: 2.45, h: 1.72, ppu: 192 };
@@ -112,8 +132,11 @@ function LayerNode({
   groupRegistry,
   slotRegistry,
   focusedId,
+  activeAccent = '#7df6d1',
+  objects = [],
 }) {
   const groupRef = useRef();
+  const anchorRef = useRef();
   const phase = index * 1.37;
   const posZ = plane.z;
 
@@ -163,6 +186,14 @@ function LayerNode({
     g.position.x += (wx - g.position.x) * k;
     g.position.y += (wy - g.position.y) * k;
     g.position.z = posZ;
+
+    /* Якорная группа пространственных объектов: без масштабирования DOM */
+    const a = anchorRef.current;
+    if (a) {
+      a.position.x += (wx - a.position.x) * k;
+      a.position.y += (wy - a.position.y) * k;
+      a.position.z = posZ;
+    }
   });
 
   const onFocus = (e) => {
@@ -171,59 +202,80 @@ function LayerNode({
   };
 
   return (
-    <group ref={groupRef} position={[0, 0, posZ]}>
-      {plane.key === 'focal' ? (
-        <RoundedBox
-          args={[plane.w, plane.h, 0.14]}
-          radius={0.055}
-          smoothness={4}
-          onClick={onFocus}
-        >
-          <MeshTransmissionMaterial
-            samples={4}
-            resolution={256}
-            transmission={1}
-            thickness={0.55}
-            roughness={0.06}
-            chromaticAberration={0.06}
-            anisotropicBlur={0.25}
-            distortion={0.12}
-            distortionScale={0.25}
-            temporalDistortion={0.04}
-            color="#0a1218"
-            attenuationDistance={0.7}
-            attenuationColor="#0e2f28"
-            backside={false}
-          />
-        </RoundedBox>
-      ) : (
-        <RoundedBox
-          args={[plane.w, plane.h, 0.08]}
-          radius={0.04}
-          smoothness={3}
-          onClick={onFocus}
-        >
-          <meshStandardMaterial
-            color="#0b1118"
-            metalness={0.92}
-            roughness={0.26}
-            envMapIntensity={1.1}
-            transparent
-            opacity={plane.key === 'far' ? 0.86 : 1}
-          />
-        </RoundedBox>
-      )}
+    <>
+      <group ref={groupRef} position={[0, 0, posZ]}>
+        {plane.key === 'focal' ? (
+          <RoundedBox
+            args={[plane.w, plane.h, 0.14]}
+            radius={0.055}
+            smoothness={4}
+            onClick={onFocus}
+          >
+            <MeshTransmissionMaterial
+              samples={4}
+              resolution={256}
+              transmission={1}
+              thickness={0.55}
+              roughness={0.06}
+              chromaticAberration={0.06}
+              anisotropicBlur={0.25}
+              distortion={0.12}
+              distortionScale={0.25}
+              temporalDistortion={0.04}
+              color="#0a1218"
+              attenuationDistance={0.7}
+              attenuationColor="#0e2f28"
+              backside={false}
+            />
+          </RoundedBox>
+        ) : (
+          <RoundedBox
+            args={[plane.w, plane.h, 0.08]}
+            radius={0.04}
+            smoothness={3}
+            onClick={onFocus}
+          >
+            <meshStandardMaterial
+              color="#0b1118"
+              metalness={0.92}
+              roughness={0.26}
+              envMapIntensity={1.1}
+              transparent
+              opacity={plane.key === 'far' ? 0.86 : 1}
+            />
+          </RoundedBox>
+        )}
 
-      <Edges
-        scale={1.02}
-        threshold={15}
-        color={plane.key === 'focal' ? '#7df6d1' : '#3f6f66'}
-        style={{
-          transparent: true,
-          opacity: plane.key === 'focal' ? 0.55 : 0.3,
-        }}
-      />
-    </group>
+        <Edges
+          scale={1.02}
+          threshold={15}
+          color={plane.key === 'focal' ? activeAccent : '#3f6f66'}
+          style={{
+            transparent: true,
+            opacity: plane.key === 'focal' ? 0.55 : 0.3,
+          }}
+        />
+      </group>
+
+      {/* Постоянные пространственные объекты слоя (существуют всегда) */}
+      <group ref={anchorRef} position={[0, 0, posZ]}>
+        {objects.map((item, objectIndex) => (
+          <SpatialObjectNode
+            key={item.id}
+            object={{
+              id: item.id,
+              form: item.metadata.form,
+              position: item.world.position,
+              scale: item.world.scale.x,
+            }}
+            accent={item.metadata.accent}
+            active={isFocused}
+            phase={objectIndex * 1.7 + index}
+            onSelect={onFocus}
+          />
+        ))}
+      </group>
+    </>
   );
 }
 
@@ -340,7 +392,64 @@ class GLBoundary extends Component {
 export function KvpHud3D() {
   const [webgl] = useState(() => supportsWebGL());
   const [locked, setLocked] = useState(false);
-  const [focusedId, setFocusedId] = useState('core');
+
+  /* Мир постоянен: слои существуют всегда, состояние переживает переключения */
+  const [world, setWorld] = useState(() => {
+    const restored = restoreWorld(readStoredWorld(), AR_LAYERS);
+    const hash = typeof window !== 'undefined' ? window.location.hash.slice(1) : '';
+    if (hash && LAYER_IDS.has(hash) && restored.layers[hash]) {
+      return enterLayer(restored, hash);
+    }
+    return restored;
+  });
+  const [focusedId, setFocusedId] = useState(
+    () => world.activeLayerId || 'core',
+  );
+
+  const focusLayer = (layerId) => {
+    if (!LAYER_IDS.has(layerId)) return;
+    setFocusedId(layerId);
+    setWorld((current) =>
+      current.layers[layerId] && current.activeLayerId !== layerId
+        ? enterLayer(current, layerId)
+        : current,
+    );
+    try {
+      window.history.replaceState(null, '', '#' + layerId);
+    } catch (e) {
+      /* history unavailable — фокус всё равно меняется */
+    }
+  };
+
+  /* Память среды: мир сериализуется при каждом изменении */
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(WORLD_STORAGE_KEY, serializeWorld(world));
+    } catch (e) {
+      /* приватный режим — мир живёт только в сессии */
+    }
+  }, [world]);
+
+  const activeTheme = worldTheme(world, focusedId);
+
+  /* Адаптер: мир → scene graph → draw list → объекты по слоям */
+  const objectsByLayer = useMemo(() => {
+    const scene = worldToScene(world);
+    const draw = composeSpatialScene(scene, {
+      focusedId: world.activeLayerId ? 'layer:' + world.activeLayerId : null,
+      viewport: {
+        width: (typeof window !== 'undefined' && window.innerWidth) || 1440,
+        height: (typeof window !== 'undefined' && window.innerHeight) || 900,
+        pixelRatio: 1,
+      },
+    });
+    const byLayer = {};
+    for (const item of draw) {
+      if (item.metadata?.kind !== 'object') continue;
+      (byLayer[item.metadata.layerId] ||= []).push(item);
+    }
+    return byLayer;
+  }, [world]);
 
   const groupRegistry = useRef({});
   const slotRegistry = useRef({});
@@ -410,6 +519,14 @@ export function KvpHud3D() {
 
       {/* TRUE 3D СЦЕНА */}
       <div className="absolute inset-0">
+        {/* Среда дышит в тоне активного слоя */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(120% 90% at 50% 45%, ${activeTheme.accent}1f 0%, transparent 55%)`,
+            transition: 'background 700ms ease',
+          }}
+        />
         <GLBoundary fallback={<KvpHudCSS />}>
           <Canvas
             dpr={[1, 1.5]}
@@ -423,20 +540,20 @@ export function KvpHud3D() {
             <Suspense fallback={null}>
               <ResponsiveCamera />
 
-              <ambientLight intensity={0.45} />
+              <ambientLight intensity={0.45} color={activeTheme.accent} />
               <pointLight
                 position={[3, 2.5, 4]}
                 intensity={55}
                 distance={16}
                 decay={2}
-                color="#7df6d1"
+                color={activeTheme.accent}
               />
               <pointLight
                 position={[-3.5, -1.5, 3]}
                 intensity={38}
                 distance={16}
                 decay={2}
-                color="#aab7ff"
+                color={activeTheme.secondary}
               />
               <pointLight
                 position={[0, 3, -1.5]}
@@ -465,7 +582,7 @@ export function KvpHud3D() {
                 <Lightformer
                   form="circle"
                   intensity={0.9}
-                  color="#ffffff"
+                  color={activeTheme.accent}
                   position={[5, 2, 2]}
                   rotation-y={-Math.PI / 2}
                   scale={[3, 3, 1]}
@@ -480,10 +597,12 @@ export function KvpHud3D() {
                     index={index}
                     plane={planeFor(layer, index)}
                     isFocused={layer.id === focusedId}
-                    setFocusedId={setFocusedId}
+                    setFocusedId={focusLayer}
                     groupRegistry={groupRegistry}
                     slotRegistry={slotRegistry}
                     focusedId={focusedId}
+                    activeAccent={activeTheme.accent}
+                    objects={objectsByLayer[layer.id] || []}
                   />
                 ))}
               </Rig>
@@ -535,7 +654,7 @@ export function KvpHud3D() {
                   isFocused={layer.id === focusedId}
                   plane={plane}
                   focusedId={focusedId}
-                  setFocusedId={setFocusedId}
+                  setFocusedId={focusLayer}
                 />
               </div>
             </div>
@@ -550,10 +669,18 @@ export function KvpHud3D() {
           return (
             <button
               key={layer.id}
-              onClick={() => setFocusedId(layer.id)}
+              onClick={() => focusLayer(layer.id)}
+              style={
+                active
+                  ? {
+                      backgroundColor: activeTheme.accent,
+                      boxShadow: `0 0 16px ${activeTheme.accent}80`,
+                    }
+                  : undefined
+              }
               className={`px-3 py-1 rounded-full transition cursor-pointer ${
                 active
-                  ? 'bg-[#7df6d1] text-slate-950 font-bold shadow-[0_0_16px_rgba(125,246,209,0.5)]'
+                  ? 'text-slate-950 font-bold'
                   : 'text-slate-300 hover:bg-white/10'
               }`}
             >
