@@ -20,3 +20,4 @@ export { createMaterialInstance, toRendererMaterialDescriptor, validateMaterialI
 export { createLight, createLightingEnvironment, createRayTracingProfile } from './lighting.js';
 export { createGeometry, createGeometryLibrary, getGeometryBounds } from './geometry.js';
 export { createWorldScene, addWorldObject, serializeWorldScene, validateWorldScene } from './world.js';
+export { buildThreeScene, configureThreeRenderer, THREE } from './three-adapter.js';
