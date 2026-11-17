@@ -75,3 +75,28 @@ Example:
 - lighting.js — physically-unit light sources, environment settings, and renderer-neutral ray-tracing quality controls.
 - Distances are metres; directional vectors are unitless; light intensity is expressed in the declared physical-unit contract; color temperature is kelvin.
 - createRayTracingProfile separates scene semantics from renderer support and allows realtime, progressive, or path-traced execution profiles. A profile describes requested quality; it does not claim that a selected device supports hardware ray tracing.
+
+## Geometry core and canonical world scene
+
+- geometry.js — renderer-neutral primitive descriptors for boxes, planes, spheres, cylinders, capsules, and externally referenced meshes. Dimensions are metres; tessellation is data, not tied to a graphics API.
+- world.js — assembles the scene graph, geometry library, material instances, and lighting environment into one canonical world object. Objects refer to geometry and material by stable IDs stored in scene-node metadata.
+- serializeWorldScene() emits a versioned JSON representation under the `netcity.world-scene` schema.
+- validateWorldScene() checks object references before an adapter consumes the world.
+
+Example:
+
+    import {
+      createGeometry, createWorldScene, addWorldObject,
+      createMaterialInstance, createLight,
+    } from './spatial/index.js';
+
+    const world = createWorldScene({
+      geometries: [createGeometry({ id: 'ground', type: 'plane', parameters: { width: 200, height: 200, segmentsX: 128, segmentsY: 128 } })],
+      materials: [{ id: 'terrain-earth', presetId: 'soil.earth' }],
+      lighting: { lights: [createLight({ id: 'sun', type: 'directional', direction: { x: -0.4, y: -1, z: -0.2 }, intensity: 100000 })] },
+    });
+    const populated = addWorldObject(world, {
+      id: 'terrain', geometryId: 'ground', materialId: 'terrain-earth',
+    });
+
+The geometry core currently describes primitives and references external mesh assets; it does not yet generate GPU buffers, load scans, implement terrain erosion, or run rigid-body/fluid simulation. Those belong to renderer and physics adapters.
