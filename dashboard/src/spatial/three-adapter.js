@@ -122,7 +122,7 @@ export function buildThreeScene(world, { background = '#202630', enableShadows =
     objects.set(node.id, mesh);
   }
 
-  for ( (const node of Object.values(world.scene.nodes)) ) {
+  for (const node of Object.values(world.scene.nodes)) {
     const object = objects.get(node.id);
     const parent = node.parentId ? objects.get(node.parentId) : scene;
     parent.add(object);
