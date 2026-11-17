@@ -1,9 +1,9 @@
 import React from 'react';
-import { KvpHud } from './components/KvpHud';
+import { KvpHud3D } from './components/KvpHud3D';
 
 export default function App() {
   return (
-    <div className="relative w-screen h-screen bg-[#060a0f] overflow-hidden">
+    <div className="relative w-screen h-dvh bg-[#060a0f] overflow-hidden">
       {/* Тонкая пространственная сетка реальности */}
       <div
         className="pointer-events-none fixed inset-0 opacity-20"
@@ -13,7 +13,7 @@ export default function App() {
           backgroundSize: '36px 36px',
         }}
       />
-      <KvpHud />
+      <KvpHud3D />
     </div>
   );
 }

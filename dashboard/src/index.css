@@ -1772,3 +1772,14 @@ body {
 .animate-scan {
   animation: pulse-scan 3s infinite ease-in-out;
 }
+
+/* Мобильные браузеры: динамическая высота вьюпорта (панель адреса Opera/Safari) */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.ar-stage {
+  height: 100dvh;
+}

@@ -9,9 +9,12 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
     "lucide-react": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "three": "^0.187.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "latest",

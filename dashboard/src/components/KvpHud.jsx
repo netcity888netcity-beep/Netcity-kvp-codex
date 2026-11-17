@@ -3,7 +3,7 @@ import { ParamField } from './ParamField';
 import { ModelRoute } from './ModelRoute';
 import { CitizenContext } from './CitizenContext';
 
-const AR_LAYERS = [
+export const AR_LAYERS = [
   {
     id: 'core',
     code: '01 // ЯДРО',
