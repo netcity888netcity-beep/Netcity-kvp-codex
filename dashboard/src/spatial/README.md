@@ -109,3 +109,28 @@ The geometry core currently describes primitives and references external mesh as
 - External mesh references deliberately require an asset resolver; area lights require the RectAreaLight addon. The adapter fails explicitly rather than silently substituting incorrect assets or lights.
 
 This is the first renderer integration, not yet a complete real-time rendering application: the host UI must create a WebGLRenderer, size its canvas, and call render per frame. Transmission/refraction depends on scene/environment setup and GPU support; ray-tracing profiles remain capability requests and do not activate hardware ray tracing by themselves.
+
+
+## Layer System
+
+- `layer-system.js` — renderer-neutral registry that separates five functional interface layers (orientation, perception, assistant, execution, evidence), seven domain layers (core, tech, civic, energy, bio, info, ident), and spatial presentation surfaces (focal, mid, far).
+- A panel binds one functional layer, one compatible domain layer, and one spatial surface. Its anchor, transform, order, visibility, opacity, enabled state, and extension metadata are independent of any renderer.
+- The initial domain-to-function assignments are defaults and are deliberately editable as the product model evolves. They are not a restriction on future layers or user-specific compositions.
+- Immutable operations support registration, update, visibility, focus, movement between surfaces, removal, composition, validation, and versioned JSON serialization.
+- This registry is a control/data model. It does not yet render panels or replace the existing KvpHud3D presentation; a later UI adapter will consume its composed output.
+
+Example:
+
+    import {
+      createLayerSystem, registerLayerPanel, composeLayerSystem,
+    } from './spatial/index.js';
+
+    let ui = createLayerSystem();
+    ui = registerLayerPanel(ui, {
+      id: 'intent-composer',
+      interfaceLayerId: 'assistant',
+      domainLayerId: 'tech',
+      surfaceId: 'focal',
+      anchor: 'head',
+    });
+    const renderPlan = composeLayerSystem(ui);
