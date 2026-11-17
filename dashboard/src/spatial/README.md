@@ -50,3 +50,28 @@ Run from dashboard/:
     npm run test:spatial
 
 The draw list is an adapter boundary, not a renderer. A Three.js/React renderer can consume it without making the core scene model depend on either library.
+
+## Material asset pipeline
+
+- material-pipeline.js — creates validated material instances from catalogue presets, binds texture asset references, and produces renderer-neutral descriptors with explicit capability reporting.
+- Renderer adapters own texture loading and conversion to native GPU objects. The core stores stable asset references only; it does not assume a browser, GPU API, or a particular renderer.
+
+Example:
+
+    import { createMaterialInstance, toRendererMaterialDescriptor } from './spatial/index.js';
+
+    const glass = createMaterialInstance({
+      id: 'window-glass-01',
+      presetId: 'glass.clear',
+      assets: { normal: 'asset://materials/glass/normal' },
+    });
+    const descriptor = toRendererMaterialDescriptor(glass, {
+      renderer: 'three-webgpu',
+      capabilities: ['normal', 'transmission'],
+    });
+
+## Lighting and ray tracing contracts
+
+- lighting.js — physically-unit light sources, environment settings, and renderer-neutral ray-tracing quality controls.
+- Distances are metres; directional vectors are unitless; light intensity is expressed in the declared physical-unit contract; color temperature is kelvin.
+- createRayTracingProfile separates scene semantics from renderer support and allows realtime, progressive, or path-traced execution profiles. A profile describes requested quality; it does not claim that a selected device supports hardware ray tracing.
