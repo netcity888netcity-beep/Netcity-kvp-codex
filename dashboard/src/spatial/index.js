@@ -18,3 +18,5 @@ export {
 } from './materials.js';
 export { createMaterialInstance, toRendererMaterialDescriptor, validateMaterialInstance } from './material-pipeline.js';
 export { createLight, createLightingEnvironment, createRayTracingProfile } from './lighting.js';
+export { createGeometry, createGeometryLibrary, getGeometryBounds } from './geometry.js';
+export { createWorldScene, addWorldObject, serializeWorldScene, validateWorldScene } from './world.js';
