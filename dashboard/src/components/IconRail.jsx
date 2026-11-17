@@ -1,5 +1,5 @@
-import { useState } from 'react'
 import {
+  Atom,
   CircleHelp,
   Database,
   Hexagon,
@@ -12,15 +12,14 @@ import {
 
 const ITEMS = [
   { id: 'console', label: 'Operator console', icon: LayoutDashboard },
+  { id: 'lattice', label: 'Neural lattice', icon: Atom },
   { id: 'agents', label: 'Agent mesh', icon: Orbit },
   { id: 'traces', label: 'Execution traces', icon: Waypoints },
   { id: 'memory', label: 'Local memory', icon: Database },
   { id: 'evidence', label: 'Evidence ledger', icon: ScrollText },
 ]
 
-export default function IconRail() {
-  const [active, setActive] = useState('console')
-
+export default function IconRail({ active = 'console', onChange }) {
   return (
     <aside className="hud-panel depth-1 flex w-full shrink-0 flex-row items-center gap-1 overflow-x-auto p-2 xl:w-[66px] xl:flex-col xl:overflow-visible xl:py-3">
       <div className="hidden h-10 w-10 shrink-0 place-items-center rounded-[6px] border border-mint/25 bg-mint/[0.06] text-mint shadow-[inset_0_0_18px_rgba(125,246,209,0.08)] xl:grid">
@@ -42,7 +41,7 @@ export default function IconRail() {
               title={item.label}
               aria-label={item.label}
               aria-pressed={active === item.id}
-              onClick={() => setActive(item.id)}
+              onClick={() => onChange?.(item.id)}
               className={`rail-item ${active === item.id ? 'active' : ''}`}
             >
               <Icon size={17} strokeWidth={1.5} />

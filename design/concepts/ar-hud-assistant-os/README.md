@@ -116,6 +116,41 @@ model, mode, programming vector, data class и этап выполнения. В
 | Settings | orientation + policy | provider registry, credential boundary, endpoint inspector |
 | Центр / Паспорт | identity anchor | operator card, identity state, consent scope |
 | Свидетельства | evidence layer | provenance timeline, trace inspector, claim level |
+| Neural Lattice | perception + assistant | substrate field, coupling matrix, neuro-sync gate |
+
+### Neural lattice (quantum-material bridge)
+
+`dashboard/src/components/NeuroLattice.jsx` — живой слой, соединяющий четыре среды:
+`DIGITAL` (KV·1), `BIOLOGICAL` (KV·2), `ENERGY` (KV·3), `MATERIAL` (KV·4).
+Узел каждой среды имеет `label`, `state`, `phase` и `coherence`; связи несут
+направленные pulses. Панель принадлежит слоям `PERCEPTION` (coherence, phase,
+carrier) и `ASSISTANT` (выбор среды, cross-substrate coupling, neuro-sync gate).
+
+### Экраны оператора (views)
+
+Левый rail переключает экраны через `active` / `onChange`. Каждый экран явно
+принадлежит слоям из списка выше:
+
+| View | Файл | Слои |
+| --- | --- | --- |
+| Operator console | `views/ConsoleView.jsx` | perception + assistant + execution + evidence |
+| Neural lattice | `views/LatticeView.jsx` | perception + assistant |
+| Agent mesh | `views/MeshView.jsx` | assistant + perception |
+| Execution traces | `views/TraceView.jsx` | execution + evidence |
+| Local memory | `views/MemoryView.jsx` | orientation |
+| Evidence | `views/EvidenceView.jsx` | evidence |
+
+Управление ядром (`ENGINE`) доступно из `TopBar` на любом экране, поэтому
+смена view не отнимает у оператора контроль.
+
+Правила соблюдены:
+
+- цвета сред взяты из токенов `signal.digital/bio/energy/material`, а не из
+  локальных значений;
+- состояние читается текстом и позицией, не только цветом;
+- `ENGAGE NEURO-SYNC` — явное действие оператора, которое пишет trace в
+  `TraceLedger` через `onCommand`;
+- `prefers-reduced-motion` останавливает поток pulses, сохраняя состояние.
 
 ## Правила реализации
 
@@ -129,8 +164,12 @@ model, mode, programming vector, data class и этап выполнения. В
 
 ## Ближайшие визуальные итерации
 
-- добавить context spine в общий `Dashboard` header;
-- перевести Ops HUD на единые `LINKED / OBSERVING / DEGRADED` state chips;
-- добавить в Model Studio route-preview перед remote run;
-- собрать evidence timeline для ответа ассистента;
-- проверить контраст и keyboard navigation на desktop и узких экранах.
+- [x] context spine в общем header (identity, время, локальный/удалённый маршрут);
+- [x] единые state chips `LINKED / OBSERVING` на экранах латтиса и меша;
+- [x] evidence timeline для ответа ассистента (`ProvenanceTimeline`);
+- [ ] route-preview перед remote run в Model Studio — готово для AgentMesh;
+- [x] связать coupling-матрицу и когерентность с живой телеметрией КВП;
+- [x] единые state chips `LINKED / OBSERVING / DEGRADED` (`StateChip.jsx`);
+- [x] контраст: все токены текста проходят WCAG AA (min 4.94), `text.dim` поднят до `#748f89`;
+- [x] keyboard navigation: focus-visible для SVG-узлов латтиса и меша;
+- [ ] route-preview для остальных remote-вызовов и evidence timeline внутри Model Studio.

@@ -14,9 +14,13 @@ export default {
         ice: '#aab7ff',
         amber: '#f0c66e',
         coral: '#ff8893',
+        digital: '#7df6d1',
+        bio: '#8fe3b0',
+        energy: '#ffb86b',
+        material: '#b9a3ff',
         ink: '#e9f6f3',
         muted: '#8ca19d',
-        dim: '#617570',
+        dim: '#748f89',
       },
       fontFamily: {
         sans: ['Inter', 'Segoe UI', 'system-ui', 'sans-serif'],
@@ -30,6 +34,9 @@ export default {
         'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
         'scan-beam': 'scan-beam 10s linear infinite',
         'flicker': 'flicker 7s linear infinite',
+        'neural-flow': 'neural-flow 2.6s linear infinite',
+        'lattice-orbit': 'spin 22s linear infinite',
+        'lattice-orbit-reverse': 'spin-reverse 30s linear infinite',
       },
       keyframes: {
         'spin-reverse': {
@@ -61,5 +68,19 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    ({ addUtilities }) => {
+      addUtilities({
+        '.perspective-none': { perspective: 'none' },
+        '.perspective-500': { perspective: '500px' },
+        '.perspective-1000': { perspective: '1000px' },
+        '.perspective-1500': { perspective: '1500px' },
+        '.perspective-2000': { perspective: '2000px' },
+        '.transform-style-3d': { transformStyle: 'preserve-3d' },
+        '.transform-style-flat': { transformStyle: 'flat' },
+        '.backface-hidden': { backfaceVisibility: 'hidden' },
+        '.backface-visible': { backfaceVisibility: 'visible' },
+      })
+    },
+  ],
 }
