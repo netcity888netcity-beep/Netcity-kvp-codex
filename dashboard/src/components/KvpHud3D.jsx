@@ -15,7 +15,7 @@ import {
   Edges,
 } from '@react-three/drei';
 import * as THREE from 'three';
-import { isPortraitSize, portraitDomFit, portraitTargets, pxToWorld } from '../spatial/layout.js';
+import { dampingFactor, isPortraitSize, PORTRAIT_DOM, portraitDomFit, portraitTargets, pxToWorld } from '../spatial/layout.js';
 import { ParamField } from './ParamField';
 import { ModelRoute } from './ModelRoute';
 import { CitizenContext } from './CitizenContext';
@@ -159,7 +159,7 @@ function LayerNode({
       }
     }
 
-    const k = Math.min(1, (dt || 0.016) * 5);
+    const k = dampingFactor(dt || 0.016, 5);
     g.position.x += (wx - g.position.x) * k;
     g.position.y += (wy - g.position.y) * k;
     g.position.z = posZ;
