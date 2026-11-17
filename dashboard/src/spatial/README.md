@@ -100,3 +100,12 @@ Example:
     });
 
 The geometry core currently describes primitives and references external mesh assets; it does not yet generate GPU buffers, load scans, implement terrain erosion, or run rigid-body/fluid simulation. Those belong to renderer and physics adapters.
+
+## Three.js renderer adapter
+
+- three-adapter.js — converts canonical world nodes into real Three.js groups, meshes, physical materials, and supported lights. Geometry and material instances are cached by stable ID.
+- `buildThreeScene(world)` returns a Three.js scene, a node-to-object map, owned GPU-resource descriptors, and a `dispose()` method.
+- `configureThreeRenderer(renderer)` enables soft shadows, sRGB output, ACES filmic tone mapping, and a bounded pixel ratio.
+- External mesh references deliberately require an asset resolver; area lights require the RectAreaLight addon. The adapter fails explicitly rather than silently substituting incorrect assets or lights.
+
+This is the first renderer integration, not yet a complete real-time rendering application: the host UI must create a WebGLRenderer, size its canvas, and call render per frame. Transmission/refraction depends on scene/environment setup and GPU support; ray-tracing profiles remain capability requests and do not activate hardware ray tracing by themselves.
