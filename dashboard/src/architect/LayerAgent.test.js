@@ -68,9 +68,10 @@ test('routeIntent: layer_status вызывает onStatus с телеметри�
     routed: 'status',
     layerId: 'energy',
     status: 'Status: Stable, Output: 1.2 GW',
+    mood: 'calm',
   });
   assert.deepEqual(seen, [
-    { layerId: 'energy', status: 'Status: Stable, Output: 1.2 GW' },
+    { layerId: 'energy', status: 'Status: Stable, Output: 1.2 GW', mood: 'calm' },
   ]);
 });
 

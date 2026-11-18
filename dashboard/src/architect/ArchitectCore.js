@@ -18,6 +18,10 @@ const LAYER_KEYWORDS = [
 
 const SPAWN_KEYWORDS = ['созда', 'spawn', 'построй', 'добав', 'сгенерир'];
 const STATUS_KEYWORDS = ['status', 'статус'];
+const EXIT_KEYWORDS = ['назад', 'выйти', 'наверх', 'орбит', 'обзор'];
+const EXIT_WORD_RE = /\b(exit|back|return|orbit|overview)\b/i;
+const MOOD_HOT_KEYWORDS = ['hot', 'горяч', 'взрыв', 'нагрей', 'разгони', 'ускорь'];
+const MOOD_CALM_KEYWORDS = ['спокойн', 'успокой', 'calm', 'тишин', 'умерь'];
 const DEFAULT_HISTORY_LIMIT = 50;
 
 function matchLayer(lowerText) {
@@ -50,9 +54,19 @@ export class ArchitectRuntime {
   #interpret(lower, raw) {
     if (!lower) return { action: 'none', payload: raw };
 
+    if (EXIT_KEYWORDS.some((word) => lower.includes(word)) || EXIT_WORD_RE.test(lower)) {
+      return { action: 'exit', payload: raw };
+    }
+
     const layerId = matchLayer(lower);
     if (STATUS_KEYWORDS.some((word) => lower.includes(word))) {
       return { action: 'layer_status', targetLayer: layerId || 'current', payload: raw };
+    }
+    if (MOOD_HOT_KEYWORDS.some((word) => lower.includes(word))) {
+      return { action: 'mood', mood: 'hot', payload: raw };
+    }
+    if (MOOD_CALM_KEYWORDS.some((word) => lower.includes(word))) {
+      return { action: 'mood', mood: 'calm', payload: raw };
     }
     if (layerId) {
       return { action: 'focus', targetLayer: layerId, payload: raw };

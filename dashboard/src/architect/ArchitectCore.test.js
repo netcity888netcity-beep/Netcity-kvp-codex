@@ -163,3 +163,66 @@ test('конвейер status: processIntent → routeIntent отдаёт тел
   assert.equal(result.layerId, 'tech');
   assert.equal(result.status, 'Fleet: 8 nodes online');
 });
+
+test('processIntent: "успокой частицы" → mood calm', () => {
+  const rt = new ArchitectRuntime();
+  const action = rt.processIntent('успокой частицы');
+  assert.deepEqual(action, {
+    action: 'mood',
+    mood: 'calm',
+    payload: 'успокой частицы',
+  });
+});
+
+test('processIntent: "взрыв частиц!" / "hot" → mood hot', () => {
+  const rt = new ArchitectRuntime();
+  assert.equal(rt.processIntent('взрыв частиц!').mood, 'hot');
+  assert.equal(rt.processIntent('make it hot').mood, 'hot');
+});
+
+test('routeIntent: mood роут вызывает onMood и возвращает режим', () => {
+  const world = makeWorld();
+  const seen = [];
+  const result = routeIntent(
+    { action: 'mood', mood: 'hot', payload: 'hot' },
+    { world, onMood: (mood) => seen.push(mood) },
+  );
+  assert.deepEqual(result, { routed: 'mood', mood: 'hot' });
+  assert.deepEqual(seen, ['hot']);
+});
+
+test('routeIntent: layer_status возвращает mood calm для стабильной телеметрии', () => {
+  const rt = new ArchitectRuntime();
+  const world = makeWorld();
+  const action = rt.processIntent('status bio');
+  const result = routeIntent(action, { world, currentLayerId: 'core' });
+  assert.equal(result.routed, 'status');
+  assert.equal(result.mood, 'calm');
+});
+
+test('processIntent: "назад" / "exit" / "back" дают action exit', () => {
+  const rt = new ArchitectRuntime();
+  assert.equal(rt.processIntent('назад').action, 'exit');
+  assert.equal(rt.processIntent('exit').action, 'exit');
+  assert.equal(rt.processIntent('назад на орбиту').action, 'exit');
+  assert.equal(rt.processIntent('go back').action, 'exit');
+  assert.equal(rt.processIntent('вернись на орбиту').action, 'exit');
+});
+
+test('processIntent: exit не перехватывает status/mood/слой', () => {
+  const rt = new ArchitectRuntime();
+  assert.equal(rt.processIntent('статус энергии').action, 'layer_status');
+  assert.equal(rt.processIntent('hot').action, 'mood');
+  assert.equal(rt.processIntent('фокус био').action, 'focus');
+});
+
+test('routeIntent: exit вызывает exitToOrbit и возвращает routed exit', () => {
+  const world = makeWorld();
+  let called = 0;
+  const result = routeIntent({ action: 'exit', payload: 'назад' }, {
+    world,
+    exitToOrbit: () => { called += 1; },
+  });
+  assert.deepEqual(result, { routed: 'exit' });
+  assert.equal(called, 1);
+});

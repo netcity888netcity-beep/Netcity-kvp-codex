@@ -9,7 +9,13 @@ import { placeObject } from '../spatial/world.js';
 import { LayerAgent } from './LayerAgent.js';
 
 const SPAWN_FORMS = ['monolith', 'beacon', 'plinth'];
+const STABLE_WORDS = /stable|optimal|nominal|quorum|online|valid|intact|calm/i;
 let spawnCounter = 0;
+
+/** Ассоциативный режим из телеметрии: стабильный статус → calm, иначе hot. */
+export function moodFromStatus(status) {
+  return STABLE_WORDS.test(status || '') ? 'calm' : 'hot';
+}
 
 /** Build a deterministic spatial object and attach it via world.js. */
 export function spawnSpatialObject(world, layerId, payload = '') {
@@ -73,8 +79,20 @@ export function routeIntent(action, engine = {}) {
     if (!world || !world.layers[layerId]) return { routed: 'none', layerId };
     const agent = new LayerAgent(layerId);
     const status = agent.getStatus().status;
-    engine.onStatus?.({ layerId, status });
-    return { routed: 'status', layerId, status };
+    const mood = moodFromStatus(status);
+    engine.onStatus?.({ layerId, status, mood });
+    return { routed: 'status', layerId, status, mood };
+  }
+
+  if (action.action === 'mood') {
+    const mood = action.mood === 'hot' ? 'hot' : 'calm';
+    engine.onMood?.(mood);
+    return { routed: 'mood', mood };
+  }
+
+  if (action.action === 'exit') {
+    engine.exitToOrbit?.();
+    return { routed: 'exit' };
   }
 
   return { routed: 'none' };
