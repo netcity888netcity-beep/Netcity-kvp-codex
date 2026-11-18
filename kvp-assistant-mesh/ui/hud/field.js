@@ -24,7 +24,10 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   400
 );
-const CAM_BASE = new THREE.Vector3(0, 11, 33);
+const isPortrait = () => window.innerWidth < 700;
+const baseCam = () =>
+  isPortrait() ? new THREE.Vector3(0, 12, 42) : new THREE.Vector3(0, 11, 33);
+let CAM_BASE = baseCam();
 camera.position.copy(CAM_BASE);
 
 const lookBase = new THREE.Vector3(0, 0, 0);
@@ -194,7 +197,7 @@ function build(doc) {
       defs.length === 1
         ? 0.55
         : (i / defs.length) * Math.PI * 2 - Math.PI / 2;
-    const node = createNode(def, angle, 14);
+    const node = createNode(def, angle, isPortrait() ? 8.5 : 14);
     node.setState(def.state || "pending");
     node.tagEl = loadLabel(node);
     scene.add(node.group);
@@ -262,7 +265,11 @@ function placeTag(el, obj, dy = 0) {
   projectV.y += dy;
   projectV.project(camera);
   const behind = projectV.z > 1;
-  const x = (projectV.x * 0.5 + 0.5) * window.innerWidth;
+  const half = (el.offsetWidth || 170) / 2 + 6;
+  const x = Math.max(
+    half,
+    Math.min((projectV.x * 0.5 + 0.5) * window.innerWidth, window.innerWidth - half)
+  );
   const y = (-projectV.y * 0.5 + 0.5) * window.innerHeight;
   const off = x < -80 || x > window.innerWidth + 80 || y < -40 || y > window.innerHeight + 40;
   el.style.opacity = behind || off ? "0" : "1";
@@ -302,6 +309,7 @@ window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  CAM_BASE = baseCam();
 });
 
 export { nodes, updateStatus, updateBridge, fillLayer };

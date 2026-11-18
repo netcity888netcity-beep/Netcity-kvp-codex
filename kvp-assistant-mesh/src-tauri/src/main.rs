@@ -43,6 +43,48 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
                 Err(e) => eprintln!("MESH_BOOT temple=FAIL error={e}"),
             }
+
+            // ПОТОК 2: перехваченный в DOM живой сессии ответ → Memory Weaver.
+            let root_dir = env.root.clone();
+            use tauri::Listener;
+            handle.listen("kvp-reply", move |event| {
+                let Some((id, text)) =
+                    kvp_assistant_mesh::channel_manager::parse_reply_event(event.payload())
+                else {
+                    return;
+                };
+                let env = kvp_assistant_mesh::MeshEnv { root: root_dir.clone() };
+                let Ok(cfg) = env.config() else {
+                    eprintln!("MEMORY_REPLY id={id} error=config");
+                    return;
+                };
+                let aum = kvp_assistant_mesh::github_connector::read_file(
+                    &cfg.temple,
+                    &env.root,
+                    "AUM.md",
+                )
+                .unwrap_or_default();
+                let memory = kvp_assistant_mesh::github_connector::read_file(
+                    &cfg.temple,
+                    &env.root,
+                    "COUNSELOR_MEMORY_CORE.md",
+                )
+                .unwrap_or_default();
+                let context = kvp_assistant_mesh::memory_weaver::compose_context(&aum, &memory);
+                let weaver =
+                    kvp_assistant_mesh::memory_weaver::MemoryWeaver::new(&env.root, &cfg.temple.journal_dir);
+                match weaver.update_last_reply(&id, &text) {
+                    Ok(true) => println!("MEMORY_REPLY id={id} bytes={} patched", text.len()),
+                    Ok(false) => {
+                        if let Err(e) = weaver.record(&id, "", &text, &context) {
+                            eprintln!("MEMORY_REPLY id={id} error={e}");
+                        } else {
+                            println!("MEMORY_REPLY id={id} bytes={} recorded", text.len());
+                        }
+                    }
+                    Err(e) => eprintln!("MEMORY_REPLY id={id} error={e}"),
+                }
+            });
             Ok(())
         })
         .run(tauri::generate_context!())?;

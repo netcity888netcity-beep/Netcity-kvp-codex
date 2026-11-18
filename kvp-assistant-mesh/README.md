@@ -68,6 +68,12 @@ python3 -m http.server 8769 -d .    # из корня kvp-assistant-mesh
 иначе `MEMORY_CORE.md`). Каждый обмен пишется в журнал памяти; `last_line`
 узла читается из журнала и попадает в HUD-слой.
 
+Поток 2 замкнут: ввод Архитектора пишется в журнал сразу (prompt), а init-скрипт
+живой сессии (`reply_interception_script`) следит за последним ответом
+`[data-message-author-role="assistant"]` и шлёт событие `kvp-reply`
+(`withGlobalTauri`) — обработчик в `main.rs` дописывает `reply` последней
+записи узла (`MEMORY_REPLY id=... bytes=... patched|recorded`).
+
 Своя память ассистента «Родный» (MiMo) — `RODNOY_MEMORY_CORE.md` в корне
 репозитория: входит в список `files` коннектора, поэтому тянется и кэшируется
 вместе с Храмом.

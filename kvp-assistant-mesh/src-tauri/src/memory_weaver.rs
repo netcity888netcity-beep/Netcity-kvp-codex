@@ -117,4 +117,83 @@ impl MemoryWeaver {
         }
         None
     }
+
+    /// Поток 2: перехваченный из DOM ответ дописывается в последнюю реплику
+    /// узла (prompt уже записан). Если записи нет — создаётся отдельной.
+    pub fn update_last_reply(&self, assistant_id: &str, reply: &str) -> Result<bool, String> {
+        let mut files: Vec<PathBuf> = match std::fs::read_dir(&self.journal_dir) {
+            Ok(rd) => rd
+                .filter_map(|e| e.ok().map(|e| e.path()))
+                .filter(|p| p.extension().map(|x| x == "jsonl").unwrap_or(false))
+                .collect(),
+            Err(_) => return Ok(false),
+        };
+        files.sort();
+        for file in files.into_iter().rev() {
+            let text = std::fs::read_to_string(&file).map_err(|e| format!("journal: {e}"))?;
+            let mut changed = false;
+            let mut out: Vec<String> = Vec::new();
+            for line in text.lines() {
+                let mut entry: JournalEntry = match serde_json::from_str(line) {
+                    Ok(e) => e,
+                    Err(_) => {
+                        out.push(line.to_string());
+                        continue;
+                    }
+                };
+                if !changed && entry.assistant_id == assistant_id {
+                    entry.reply = reply.to_string();
+                    changed = true;
+                }
+                out.push(serde_json::to_string(&entry).map_err(|e| e.to_string())?);
+            }
+            if changed {
+                std::fs::write(&file, out.join("\n") + "\n")
+                    .map_err(|e| format!("journal write: {e}"))?;
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ctx() -> ContextPackage {
+        compose_context("AUM текст", "память\nещё")
+    }
+
+    #[test]
+    fn context_hash_is_stable_fingerprint() {
+        assert_eq!(context_hash("aum"), context_hash("aum"));
+        assert_ne!(context_hash("aum"), context_hash("bum"));
+        let c = ctx();
+        assert_eq!(c.aum, "AUM текст");
+        assert!(c.memory_slice.contains("память"));
+    }
+
+    #[test]
+    fn record_then_update_last_reply_flow() {
+        let root = std::env::temp_dir().join(format!("kvp-weaver-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let w = MemoryWeaver::new(&root, "memory/log");
+        w.ensure_dir().unwrap();
+
+        let e = w.record("angie_556", "привет", "", &ctx()).unwrap();
+        assert_eq!(e.reply, "");
+        w.record("astro_6", "другое", "старый ответ", &ctx()).unwrap();
+
+        assert!(w.update_last_reply("angie_556", "новый ответ").unwrap());
+        let last = w.last_entry_for("angie_556").unwrap();
+        assert_eq!(last.prompt, "привет");
+        assert_eq!(last.reply, "новый ответ");
+
+        let other = w.last_entry_for("astro_6").unwrap();
+        assert_eq!(other.reply, "старый ответ");
+
+        assert!(!w.update_last_reply("ghost", "x").unwrap());
+        let _ = std::fs::remove_dir_all(&root);
+    }
 }
