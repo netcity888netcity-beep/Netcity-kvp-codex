@@ -6,6 +6,7 @@
  * spawn actions materialize permanent world objects.
  */
 import { placeObject } from '../spatial/world.js';
+import { LayerAgent } from './LayerAgent.js';
 
 const SPAWN_FORMS = ['monolith', 'beacon', 'plinth'];
 let spawnCounter = 0;
@@ -61,6 +62,19 @@ export function routeIntent(action, engine = {}) {
     const result = spawnSpatialObject(world, layerId, action.payload);
     if (result.routed === 'object') setWorld?.(result.world);
     return { routed: 'object', layerId, objectId: result.objectId };
+  }
+
+  if (action.action === 'layer_status') {
+    const requested = action.targetLayer;
+    const layerId =
+      requested && requested !== 'current'
+        ? requested
+        : currentLayerId || world?.activeLayerId;
+    if (!world || !world.layers[layerId]) return { routed: 'none', layerId };
+    const agent = new LayerAgent(layerId);
+    const status = agent.getStatus().status;
+    engine.onStatus?.({ layerId, status });
+    return { routed: 'status', layerId, status };
   }
 
   return { routed: 'none' };

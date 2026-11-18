@@ -32,6 +32,7 @@ import { SpatialObjectNode } from './SpatialObject.jsx';
 import { AR_LAYERS, KvpHud as KvpHudCSS } from './KvpHud';
 import { ArchitectRuntime } from '../architect/ArchitectCore.js';
 import { routeIntent } from '../architect/IntentRouter.js';
+import { LayerAgent } from '../architect/LayerAgent.js';
 
 const LAYER_IDS = new Set(AR_LAYERS.map((layer) => layer.id));
 
@@ -414,6 +415,21 @@ export function KvpHud3D() {
   const [routeToast, setRouteToast] = useState(null);
   const toastTimer = useRef();
 
+  /* LAYER AGENTS (Direction 03): лог-панель телеметрии слоёв */
+  const [agentLog, setAgentLog] = useState([]);
+  const logSeq = useRef(0);
+  const pushAgentLog = (layerId, text) => {
+    logSeq.current += 1;
+    const entry = {
+      id: logSeq.current,
+      time: new Date().toLocaleTimeString('en-GB'),
+      layerId,
+      text,
+    };
+    console.log(`Architect: Agent [${layerId.toUpperCase()}] ${text}`);
+    setAgentLog((prev) => [entry, ...prev].slice(0, 3));
+  };
+
   const focusLayer = (layerId) => {
     if (!LAYER_IDS.has(layerId)) return;
     setFocusedId(layerId);
@@ -439,17 +455,30 @@ export function KvpHud3D() {
       setWorld,
       focusLayer,
       currentLayerId: focusedId,
+      onStatus: ({ layerId, status }) => pushAgentLog(layerId, status),
     });
     const label = result.layerId ? String(result.layerId).toUpperCase() : 'NONE';
-    console.log(`Architect: Received intent -> "${text}"`);
-    console.log(`Architect: Routing to layer [${label}]`);
-    if (result.routed !== 'none') {
+    if (result.routed === 'status') {
+      const detail = `[${label}] ${result.status}`;
+      console.log(`Architect: Received intent -> ${detail}`);
       clearTimeout(toastTimer.current);
       setRouteToast({
         intent: text.length > 40 ? text.slice(0, 39) + '…' : text,
         label,
+        detail,
       });
       toastTimer.current = setTimeout(() => setRouteToast(null), 6000);
+    } else {
+      console.log(`Architect: Received intent -> "${text}"`);
+      console.log(`Architect: Routing to layer [${label}]`);
+      if (result.routed !== 'none') {
+        clearTimeout(toastTimer.current);
+        setRouteToast({
+          intent: text.length > 40 ? text.slice(0, 39) + '…' : text,
+          label,
+        });
+        toastTimer.current = setTimeout(() => setRouteToast(null), 6000);
+      }
     }
     setIntent('');
   };
@@ -467,6 +496,12 @@ export function KvpHud3D() {
     submitIntent(cmd);
   }, []);
   useEffect(() => () => clearTimeout(toastTimer.current), []);
+
+  /* Агент слоя: при каждом фокусе — краткий статус в лог-панель */
+  useEffect(() => {
+    const agent = new LayerAgent(focusedId);
+    pushAgentLog(focusedId, agent.getStatus().status);
+  }, [focusedId]);
 
   /* Память среды: мир сериализуется при каждом изменении */
   useEffect(() => {
@@ -709,16 +744,33 @@ export function KvpHud3D() {
         })}
       </div>
 
+      {/* AGENT LOG: лог-панель телеметрии Layer Agents под шапкой */}
+      {agentLog.length > 0 && (
+        <div className="fixed top-[72px] left-6 right-6 z-40 px-4 py-1.5 rounded-xl hud-glass-mid font-mono text-[10px] leading-[13px] text-slate-300 space-y-0.5 pointer-events-none">
+          {agentLog.map((entry) => (
+            <div key={entry.id} className="truncate">
+              <span className="text-slate-500">{entry.time}</span>{' '}
+              <span className="text-[#7df6d1]">
+                [{entry.layerId.toUpperCase()}]
+              </span>{' '}
+              {entry.text}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ARCHITECT TOAST: отклик Мозга на намерение */}
       {routeToast && (
         <div
-          className="fixed top-20 right-6 z-50 max-w-[min(340px,84vw)] px-4 py-3 rounded-xl hud-glass-mid font-mono text-[11px] space-y-1"
+          className="fixed top-40 right-6 z-50 max-w-[min(340px,84vw)] px-4 py-3 rounded-xl hud-glass-mid font-mono text-[11px] space-y-1"
           style={{ borderLeft: `2px solid ${activeTheme.accent}` }}
         >
           <div className="truncate text-[#7df6d1]">
             Architect: Processing intent '{routeToast.intent}'
           </div>
-          <div className="text-slate-300">Routing to layer [{routeToast.label}]</div>
+          <div className="text-slate-300">
+            {routeToast.detail || `Routing to layer [${routeToast.label}]`}
+          </div>
         </div>
       )}
 

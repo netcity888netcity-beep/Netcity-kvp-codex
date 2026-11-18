@@ -126,3 +126,40 @@ test('конвейер: processIntent → routeIntent фокусирует эн�
   assert.equal(result.routed, 'layer');
   assert.equal(focused, 'energy');
 });
+
+test('processIntent: "status energy" → layer_status на энергии', () => {
+  const rt = new ArchitectRuntime();
+  const action = rt.processIntent('status energy');
+  assert.deepEqual(action, {
+    action: 'layer_status',
+    targetLayer: 'energy',
+    payload: 'status energy',
+  });
+});
+
+test('processIntent: "статус энергии" → layer_status на энергии', () => {
+  const rt = new ArchitectRuntime();
+  const action = rt.processIntent('статус энергии');
+  assert.equal(action.action, 'layer_status');
+  assert.equal(action.targetLayer, 'energy');
+});
+
+test('processIntent: "покажи статус" без слоя → layer_status current', () => {
+  const rt = new ArchitectRuntime();
+  const action = rt.processIntent('покажи статус');
+  assert.deepEqual(action, {
+    action: 'layer_status',
+    targetLayer: 'current',
+    payload: 'покажи статус',
+  });
+});
+
+test('конвейер status: processIntent → routeIntent отдаёт телеметрию', () => {
+  const rt = new ArchitectRuntime();
+  const world = makeWorld();
+  const action = rt.processIntent('status tech');
+  const result = routeIntent(action, { world, currentLayerId: 'core' });
+  assert.equal(result.routed, 'status');
+  assert.equal(result.layerId, 'tech');
+  assert.equal(result.status, 'Fleet: 8 nodes online');
+});

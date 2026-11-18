@@ -17,6 +17,7 @@ const LAYER_KEYWORDS = [
 ];
 
 const SPAWN_KEYWORDS = ['созда', 'spawn', 'построй', 'добав', 'сгенерир'];
+const STATUS_KEYWORDS = ['status', 'статус'];
 const DEFAULT_HISTORY_LIMIT = 50;
 
 function matchLayer(lowerText) {
@@ -50,6 +51,9 @@ export class ArchitectRuntime {
     if (!lower) return { action: 'none', payload: raw };
 
     const layerId = matchLayer(lower);
+    if (STATUS_KEYWORDS.some((word) => lower.includes(word))) {
+      return { action: 'layer_status', targetLayer: layerId || 'current', payload: raw };
+    }
     if (layerId) {
       return { action: 'focus', targetLayer: layerId, payload: raw };
     }
