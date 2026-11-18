@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>KVP ASSISTANT MESH</title>
+  <link rel="stylesheet" href="./styles/hud.css" />
+</head>
+<body>
+  <div id="stage"></div>
+
+  <header id="topbar">
+    <div id="brand">KVP ASSISTANT MESH <span>v1.0 · MVP</span></div>
+    <div id="temple-line" class="mono">TEMPLE_… </div>
+  </header>
+
+  <div id="labels"></div>
+
+  <aside id="layer" class="hidden">
+    <div class="layer-head">
+      <div>
+        <div id="layer-sigil" class="sigil"></div>
+        <div id="layer-name">—</div>
+        <div id="layer-model" class="mono dim">—</div>
+      </div>
+      <button id="layer-close" title="закрыть">✕</button>
+    </div>
+    <div class="layer-row"><span class="dim">id</span><span id="layer-id" class="mono">—</span></div>
+    <div class="layer-row"><span class="dim">channel</span><span id="layer-channel" class="mono">—</span></div>
+    <div class="layer-row"><span class="dim">state</span><span id="layer-state" class="mono">—</span></div>
+    <div class="layer-block">
+      <div class="dim">состояние узла</div>
+      <div class="state-grid">
+        <button data-state="idle">покой</button>
+        <button data-state="active">активен</button>
+        <button data-state="thinking">мыслит</button>
+        <button data-state="error">сбой</button>
+      </div>
+    </div>
+    <div class="layer-block">
+      <div class="dim">последняя строка</div>
+      <div id="layer-last" class="mono">—</div>
+    </div>
+  </aside>
+
+  <footer id="bottombar">
+    <div id="bridge-line" class="mono"></div>
+    <div id="hint" class="dim">тап по узлу — фокус · ✕ — назад</div>
+  </footer>
+
+  <script>
+    window.addEventListener("error", function (e) {
+      var t = document.getElementById("temple-line");
+      if (t) t.textContent = "JS_ERR: " + (e.message || e.type) + " @" + (e.filename || "").split("/").pop() + ":" + (e.lineno || 0);
+    });
+    window.addEventListener("unhandledrejection", function (e) {
+      var t = document.getElementById("temple-line");
+      if (t) t.textContent = "JS_REJ: " + ((e.reason && e.reason.message) || e.reason);
+    });
+  </script>
+  <script type="module" src="./hud/field.js"></script>
+</body>
+</html>

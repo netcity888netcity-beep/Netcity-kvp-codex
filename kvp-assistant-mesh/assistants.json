@@ -1,0 +1,22 @@
+{
+  "assistants": [
+    {
+      "id": "angie_556",
+      "name": "Энджи 5.5.6",
+      "sigil": "triangle-spiral",
+      "target": "https://chatgpt.com/",
+      "model_hint": "gpt-5.6",
+      "channel": "webview-persistent",
+      "memory_scope": ["AUM.md", "MEMORY_CORE.md"]
+    },
+    {
+      "id": "astro_6",
+      "name": "Астро",
+      "sigil": "star-orbit",
+      "target": "https://chatgpt.com/",
+      "model_hint": "gpt-6",
+      "channel": "webview-persistent",
+      "memory_scope": ["AUM.md", "MEMORY_CORE.md"]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "temple": {
+    "repo_url": "https://github.com/netcity888netcity-beep/Netcity-kvp-codex.git",
+    "branch": "main",
+    "refresh_minutes": 30,
+    "cache_dir": ".cache/temple",
+    "files": [
+      "AUM.md",
+      "COUNSELOR_MEMORY_CORE.md",
+      "NETCITY_MEMORY_CORE.md",
+      "MANIFEST.md",
+      "README.md"
+    ],
+    "journal_dir": "memory/log"
+  },
+  "assistants": {
+    "manifest": "assistants.json",
+    "limit": 1
+  },
+  "hud": {
+    "state_file": "mesh-state.json"
+  }
+}

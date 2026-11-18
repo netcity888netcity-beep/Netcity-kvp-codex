@@ -1,0 +1,4 @@
+src-tauri/target/
+.cache/
+mesh-state.json
+memory/tmp/
