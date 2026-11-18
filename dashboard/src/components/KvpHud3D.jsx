@@ -30,6 +30,8 @@ import { ModelRoute } from './ModelRoute';
 import { CitizenContext } from './CitizenContext';
 import { SpatialObjectNode } from './SpatialObject.jsx';
 import { AR_LAYERS, KvpHud as KvpHudCSS } from './KvpHud';
+import { ArchitectRuntime } from '../architect/ArchitectCore.js';
+import { routeIntent } from '../architect/IntentRouter.js';
 
 const LAYER_IDS = new Set(AR_LAYERS.map((layer) => layer.id));
 
@@ -406,6 +408,12 @@ export function KvpHud3D() {
     () => world.activeLayerId || 'core',
   );
 
+  /* ARCHITECT RUNTIME (Direction 02): тракт «намерение → действие» */
+  const runtimeRef = useRef(new ArchitectRuntime());
+  const [intent, setIntent] = useState('');
+  const [routeToast, setRouteToast] = useState(null);
+  const toastTimer = useRef();
+
   const focusLayer = (layerId) => {
     if (!LAYER_IDS.has(layerId)) return;
     setFocusedId(layerId);
@@ -420,6 +428,45 @@ export function KvpHud3D() {
       /* history unavailable — фокус всё равно меняется */
     }
   };
+
+  /* Приём намерения: processIntent → routeIntent → Spatial Engine */
+  const submitIntent = (value) => {
+    const text = (typeof value === 'string' ? value : intent).trim();
+    if (!text) return;
+    const action = runtimeRef.current.processIntent(text);
+    const result = routeIntent(action, {
+      world,
+      setWorld,
+      focusLayer,
+      currentLayerId: focusedId,
+    });
+    const label = result.layerId ? String(result.layerId).toUpperCase() : 'NONE';
+    console.log(`Architect: Received intent -> "${text}"`);
+    console.log(`Architect: Routing to layer [${label}]`);
+    if (result.routed !== 'none') {
+      clearTimeout(toastTimer.current);
+      setRouteToast({
+        intent: text.length > 40 ? text.slice(0, 39) + '…' : text,
+        label,
+      });
+      toastTimer.current = setTimeout(() => setRouteToast(null), 6000);
+    }
+    setIntent('');
+  };
+
+  /* Boot: #cmd=<команда> — авто-исполнение намерения при загрузке */
+  const bootIntent = useRef(
+    typeof window !== 'undefined' && window.location.hash.startsWith('#cmd=')
+      ? decodeURIComponent(window.location.hash.slice('#cmd='.length))
+      : '',
+  );
+  useEffect(() => {
+    if (!bootIntent.current) return;
+    const cmd = bootIntent.current;
+    bootIntent.current = '';
+    submitIntent(cmd);
+  }, []);
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
 
   /* Память среды: мир сериализуется при каждом изменении */
   useEffect(() => {
@@ -661,6 +708,44 @@ export function KvpHud3D() {
           );
         })}
       </div>
+
+      {/* ARCHITECT TOAST: отклик Мозга на намерение */}
+      {routeToast && (
+        <div
+          className="fixed top-20 right-6 z-50 max-w-[min(340px,84vw)] px-4 py-3 rounded-xl hud-glass-mid font-mono text-[11px] space-y-1"
+          style={{ borderLeft: `2px solid ${activeTheme.accent}` }}
+        >
+          <div className="truncate text-[#7df6d1]">
+            Architect: Processing intent '{routeToast.intent}'
+          </div>
+          <div className="text-slate-300">Routing to layer [{routeToast.label}]</div>
+        </div>
+      )}
+
+      {/* COMMAND PALETTE: ввод намерений (Architect Runtime) над навигацией */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submitIntent();
+        }}
+        className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 w-[min(560px,92vw)] flex items-center gap-2 px-4 py-2.5 rounded-full hud-glass-mid font-mono text-[11px]"
+      >
+        <span className="shrink-0 text-[#7df6d1]">architect@netcity:~$</span>
+        <input
+          value={intent}
+          onChange={(e) => setIntent(e.target.value)}
+          placeholder="намерение → Enter"
+          aria-label="Intent input"
+          className="min-w-0 flex-1 bg-transparent text-white placeholder:text-slate-500 outline-none"
+        />
+        <button
+          type="submit"
+          title="Отправить намерение"
+          className="shrink-0 px-2 py-0.5 rounded border border-white/25 text-[#7df6d1] cursor-pointer"
+        >
+          ⏎
+        </button>
+      </form>
 
       {/* НИЖНЯЯ ПАНЕЛЬ БЫСТРОГО ВЫБОРА СЛОЁВ */}
       <nav className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 px-3 py-2 rounded-full hud-glass-mid font-mono text-[11px]">

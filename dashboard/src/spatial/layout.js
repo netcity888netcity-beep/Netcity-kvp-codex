@@ -7,7 +7,7 @@
 
 export const PORTRAIT_DOM = Object.freeze({ focal: 0.7, mid: 0.45, far: 0.32 });
 export const PORTRAIT_TOP = 64;
-export const PORTRAIT_BOTTOM = 72;
+export const PORTRAIT_BOTTOM = 116;
 
 export function isPortraitSize(width, height) {
   return width < height * 1.05;
