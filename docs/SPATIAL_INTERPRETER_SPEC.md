@@ -539,3 +539,41 @@ Representation — не декоративная 3D-карточка. Это ф�
 **NetCity не открывает человеку очередное приложение и не помещает набор окон в 3D. NetCity понимает намерение человека, безопасно организует доступные возможности и формирует нужное представление информации, инструмента или действия в сопряжённом пространстве — сохраняя первичность физического мира, приватность, прозрачность и человеческий контроль.**
 
 Это целевая архитектура. Её реализация подтверждается кодом, тестами и испытаниями, а не формулировками документа.
+
+---
+
+## 16. Stage A implementation note — contract foundation
+
+**Status:** IN DEVELOPMENT · contract validation foundation committed.
+
+The first framework-neutral JavaScript contract module is:
+
+- `dashboard/src/architect/SpatialContracts.js`
+- Tests: `dashboard/src/architect/SpatialContracts.test.js`
+
+It currently defines versioned validators for:
+
+- `netcity.spatial-intent.v0.1`
+- `netcity.plan.v0.1`
+- `netcity.capability.v0.1`
+- `netcity.representation.v0.1`
+
+It also provides a small in-memory `CapabilityRegistry` that accepts validated descriptors and rejects duplicate IDs. Registration is metadata-only: it does not dispatch adapters, authorize operations, or execute commands.
+
+**Explicit boundaries:** these contracts are a validation foundation, not yet the production runtime pipeline. They are not yet wired into `ArchitectRuntime`, `IntentRouter`, KVP authorization, persistent registry storage, or Spatial Engine materialization. The current keyword-based intent interpreter and deterministic router remain unchanged. No new capability should be described as executable solely because its descriptor validates.
+
+The contract tests are authored but have not been executed in this change. Run from `dashboard/`:
+
+```bash
+npm run test:architect
+npm run test:spatial
+npm run build
+```
+
+Next Stage A tasks:
+
+1. Review and freeze the v0.1 field names and enums against the current Architect and world models.
+2. Add graph validation for dependency cycles and operation/capability consistency.
+3. Introduce a deterministic planner that produces a validated proposal without executing it.
+4. Add a safe bridge from current Architect actions to the new Intent/Plan contracts, preserving existing behavior.
+5. Only after these checks, design the KVP authorization integration as a separate stage.
