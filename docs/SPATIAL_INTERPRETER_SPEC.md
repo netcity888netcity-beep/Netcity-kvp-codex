@@ -560,7 +560,7 @@ It currently defines versioned validators for:
 
 It also provides a small in-memory `CapabilityRegistry` that accepts validated descriptors and rejects duplicate IDs. Registration is metadata-only: it does not dispatch adapters, authorize operations, or execute commands.
 
-**Explicit boundaries:** these contracts are a validation foundation, not yet the production runtime pipeline. They are not yet wired into `ArchitectRuntime`, `IntentRouter`, KVP authorization, persistent registry storage, or Spatial Engine materialization. The current keyword-based intent interpreter and deterministic router remain unchanged. No new capability should be described as executable solely because its descriptor validates.
+**Explicit boundaries:** the contracts are a validation foundation, not yet the production runtime pipeline. `ArchitectRuntime.processIntentContract()` now provides a non-executing bridge from supported legacy actions to validated Intent envelopes. The existing `processIntent()` behavior and `IntentRouter` dispatch path remain unchanged. There is no contract-based Plan generation, KVP authorization integration, persistent capability registry, or Spatial Engine materialization bridge yet. No new capability should be described as executable solely because its descriptor validates.
 
 The contract tests are authored but have not been executed in this change. Run from `dashboard/`:
 
