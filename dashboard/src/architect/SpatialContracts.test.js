@@ -23,6 +23,15 @@ const capability = {
   cancel_supported: true,
 };
 
+const createCapability = {
+  ...capability,
+  id: 'spatial.representation.create',
+  description: 'Create a spatial representation',
+  operation: 'CREATE',
+  adapter: 'spatial-materializer',
+  permissions: ['spatial.representation.create'],
+};
+
 const intent = {
   schema_version: 'netcity.spatial-intent.v0.1',
   request_id: 'req-001',
@@ -75,13 +84,18 @@ test('registry accepts validated capabilities and rejects duplicates', () => {
 test('validates plan structure, dependencies and registered capabilities', () => {
   assert.equal(validateSpatialPlan(plan).valid, true);
   assert.equal(validateSpatialPlan(plan, { capabilities: [capability] }).valid, false);
-  const withBoth = { ...plan, steps: [
-    plan.steps[0],
-    { ...plan.steps[1], capability: 'energy.telemetry.read' },
-  ] };
-  assert.equal(validateSpatialPlan(withBoth, { capabilities: [capability] }).valid, true);
+  assert.equal(validateSpatialPlan(plan, { capabilities: [capability, createCapability] }).valid, true);
   const broken = { ...plan, steps: [{ ...plan.steps[0], depends_on: ['missing'] }] };
   assert.equal(validateSpatialPlan(broken).valid, false);
+  const mismatch = { ...plan, steps: [{ ...plan.steps[0], operation: 'CREATE' }] };
+  assert.equal(validateSpatialPlan(mismatch, { capabilities: [capability] }).valid, false);
+  const cyclic = { ...plan, steps: [
+    { step_id: 'a', capability: 'energy.telemetry.read', operation: 'READ', depends_on: ['b'] },
+    { step_id: 'b', capability: 'energy.telemetry.read', operation: 'READ', depends_on: ['a'] },
+  ] };
+  const cycleResult = validateSpatialPlan(cyclic, { capabilities: [capability] });
+  assert.equal(cycleResult.valid, false);
+  assert.ok(cycleResult.errors.some((error) => error.includes('cycle')));
 });
 
 test('validates representation semantics and finite spatial coordinates', () => {
