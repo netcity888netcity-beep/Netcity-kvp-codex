@@ -570,10 +570,14 @@ npm run test:spatial
 npm run build
 ```
 
+The validator now checks that dependency references exist, rejects self-dependencies and dependency cycles, and verifies that each step's declared operation matches the registered capability operation when a registry is supplied. Regression cases for cycles and operation mismatches have been added to the contract test file.
+
+**Verification status:** test cases are authored, but no test runner was available in this GitHub editing session; passing tests are not claimed. The package scripts are present in `dashboard/package.json`: run them from `dashboard/`.
+
 Next Stage A tasks:
 
 1. Review and freeze the v0.1 field names and enums against the current Architect and world models.
-2. Add graph validation for dependency cycles and operation/capability consistency.
+2. Run `npm run test:architect`, `npm run test:spatial` and `npm run build` from `dashboard/`; repair any regressions.
 3. Introduce a deterministic planner that produces a validated proposal without executing it.
 4. Add a safe bridge from current Architect actions to the new Intent/Plan contracts, preserving existing behavior.
 5. Only after these checks, design the KVP authorization integration as a separate stage.
