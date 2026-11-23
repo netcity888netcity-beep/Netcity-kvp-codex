@@ -1,10 +1,12 @@
 /**
  * NetCity Architect Runtime — Digital Self intent core.
- *
+ */
  * Framework-neutral mock interpretation layer: raw intent text in,
  * structured action object out. No React, no Three.js, no side effects —
  * routing lives in IntentRouter.js.
  */
+
+import { validateSpatialIntent } from './SpatialContracts.js';
 
 const LAYER_KEYWORDS = [
   ['energy', ['энерг', 'energy']],
@@ -23,6 +25,14 @@ const EXIT_WORD_RE = /\b(exit|back|return|orbit|overview)\b/i;
 const MOOD_HOT_KEYWORDS = ['hot', 'горяч', 'взрыв', 'нагрей', 'разгони', 'ускорь'];
 const MOOD_CALM_KEYWORDS = ['спокойн', 'успокой', 'calm', 'тишин', 'умерь'];
 const DEFAULT_HISTORY_LIMIT = 50;
+const CONTRACT_LAYERS = new Set(['core', 'bio', 'tech', 'energy', 'info', 'civic', 'ident']);
+const CONTRACT_OUTCOMES = Object.freeze({
+  focus: 'layer_focus',
+  layer_status: 'layer_status',
+  mood: 'visual_state',
+  spawn_object: 'spatial_object',
+  exit: 'return_to_orbit',
+});
 
 function matchLayer(lowerText) {
   for (const [layerId, words] of LAYER_KEYWORDS) {
@@ -35,6 +45,64 @@ export class ArchitectRuntime {
   constructor({ historyLimit = DEFAULT_HISTORY_LIMIT } = {}) {
     this.historyLimit = historyLimit;
     this.history = [];
+    this.contractRequestSequence = 0;
+  }
+
+  /**
+   * Capture the legacy interpretation as a validated Spatial Intent envelope.
+   *
+   * This is an observation/translation bridge only: it does not build an
+   * executable plan, authorize a capability, or dispatch a spatial action.
+   * processIntent() remains the unchanged compatibility entry point.
+   */
+  processIntentContract(intentString, { activeLayerId = null } = {}) {
+    const action = this.processIntent(intentString);
+    const domain = CONTRACT_LAYERS.has(action.targetLayer)
+      ? action.targetLayer
+      : CONTRACT_LAYERS.has(activeLayerId)
+        ? activeLayerId
+        : null;
+
+    if (!CONTRACT_OUTCOMES[action.action] || (!domain && action.action !== 'mood' && action.action !== 'exit')) {
+      return {
+        action,
+        intent: null,
+        validation: {
+          valid: false,
+          errors: ['intent requires clarification before a spatial contract can be created'],
+        },
+        status: 'NEEDS_CLARIFICATION',
+      };
+    }
+
+    this.contractRequestSequence += 1;
+    const raw = typeof intentString === 'string' ? intentString : '';
+    const intent = {
+      schema_version: 'netcity.spatial-intent.v0.1',
+      request_id: 'architect-' + this.contractRequestSequence,
+      intent: {
+        raw,
+        goal: action.action,
+        domain: [domain || 'core'],
+      },
+      context: {
+        source: 'architect-runtime',
+        active_layer: domain || activeLayerId || null,
+        legacy_action: action.action,
+      },
+      requested_outcome: {
+        kind: CONTRACT_OUTCOMES[action.action],
+      },
+    };
+
+    // Lazy-free static import at module level keeps validation deterministic.
+    const validation = validateSpatialIntent(intent);
+    return {
+      action,
+      intent,
+      validation,
+      status: validation.valid ? 'PROPOSED' : 'NEEDS_CLARIFICATION',
+    };
   }
 
   /**
