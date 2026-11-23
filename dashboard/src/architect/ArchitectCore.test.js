@@ -9,6 +9,38 @@ const TEST_LAYER_IDS = ['core', 'tech', 'civic', 'energy', 'bio', 'info', 'ident
 const makeWorld = () =>
   createSpatialWorld({ id: 'test-world', layers: TEST_LAYER_IDS.map((id) => ({ id })) });
 
+test('processIntentContract: wraps a legacy focus action in a validated intent', () => {
+  const rt = new ArchitectRuntime();
+  const result = rt.processIntentContract('Переключись на энергию', { activeLayerId: 'core' });
+  assert.equal(result.action.action, 'focus');
+  assert.equal(result.status, 'PROPOSED');
+  assert.equal(result.validation.valid, true);
+  assert.equal(result.intent.schema_version, 'netcity.spatial-intent.v0.1');
+  assert.equal(result.intent.intent.goal, 'focus');
+  assert.deepEqual(result.intent.intent.domain, ['energy']);
+  assert.equal(result.intent.requested_outcome.kind, 'layer_focus');
+});
+
+test('processIntentContract: resolves current-layer actions only from supplied context', () => {
+  const rt = new ArchitectRuntime();
+  const unresolved = rt.processIntentContract('создай объект');
+  assert.equal(unresolved.status, 'NEEDS_CLARIFICATION');
+  assert.equal(unresolved.intent, null);
+
+  const resolved = rt.processIntentContract('создай объект', { activeLayerId: 'tech' });
+  assert.equal(resolved.validation.valid, true);
+  assert.deepEqual(resolved.intent.intent.domain, ['tech']);
+  assert.equal(resolved.intent.requested_outcome.kind, 'spatial_object');
+});
+
+test('processIntentContract: unknown intent is not promoted into a spatial contract', () => {
+  const rt = new ArchitectRuntime();
+  const result = rt.processIntentContract('просто поговори со мной');
+  assert.equal(result.action.action, 'unknown');
+  assert.equal(result.intent, null);
+  assert.equal(result.status, 'NEEDS_CLARIFICATION');
+});
+
 test('processIntent: "Переключись на энергию" gives focus action', () => {
   const rt = new ArchitectRuntime();
   const action = rt.processIntent('Переключись на энергию');
