@@ -1,6 +1,6 @@
 /**
  * NetCity Architect Runtime — Digital Self intent core.
- */
+ *
  * Framework-neutral mock interpretation layer: raw intent text in,
  * structured action object out. No React, no Three.js, no side effects —
  * routing lives in IntentRouter.js.
