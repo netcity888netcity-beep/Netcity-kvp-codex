@@ -95,7 +95,6 @@ export class ArchitectRuntime {
       },
     };
 
-    // Lazy-free static import at module level keeps validation deterministic.
     const validation = validateSpatialIntent(intent);
     return {
       action,
