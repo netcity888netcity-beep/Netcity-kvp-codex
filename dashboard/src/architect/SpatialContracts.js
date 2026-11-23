@@ -101,7 +101,8 @@ export function validateSpatialPlan(input, { capabilities = [] } = {}) {
     errors.push('steps must be a non-empty array');
   } else {
     const ids = new Set();
-    const capabilityIds = new Set(capabilities.filter((c) => validateCapability(c).valid).map((c) => c.id));
+    const validCapabilities = capabilities.filter((c) => validateCapability(c).valid);
+    const capabilitiesById = new Map(validCapabilities.map((c) => [c.id, c]));
     for (const [index, step] of input.steps.entries()) {
       const path = 'steps[' + index + ']';
       if (!isRecord(step)) { errors.push(path + ' must be an object'); continue; }
@@ -112,20 +113,42 @@ export function validateSpatialPlan(input, { capabilities = [] } = {}) {
         if (ids.has(step.step_id)) errors.push(path + '.step_id must be unique');
         ids.add(step.step_id);
       }
-      if (capabilities.length && nonEmpty(step.capability) && !capabilityIds.has(step.capability)) {
-        errors.push(path + '.capability is not present in the validated registry');
+      if (capabilities.length && nonEmpty(step.capability)) {
+        const registered = capabilitiesById.get(step.capability);
+        if (!registered) errors.push(path + '.capability is not present in the validated registry');
+        else if (step.operation !== registered.operation) {
+          errors.push(path + '.operation does not match capability operation ' + registered.operation);
+        }
       }
       if (step.depends_on != null && (!Array.isArray(step.depends_on) ||
           step.depends_on.some((id) => !nonEmpty(id)))) {
         errors.push(path + '.depends_on must be an array of step ids');
       }
     }
+    const graph = new Map();
     for (const [index, step] of input.steps.entries()) {
       if (!isRecord(step) || !Array.isArray(step.depends_on)) continue;
+      const stepId = step.step_id;
       for (const dependency of step.depends_on) {
         if (!ids.has(dependency)) errors.push('steps[' + index + '] references unknown dependency: ' + dependency);
-        if (dependency === step.step_id) errors.push('steps[' + index + '] cannot depend on itself');
+        if (dependency === stepId) errors.push('steps[' + index + '] cannot depend on itself');
       }
+      if (nonEmpty(stepId)) graph.set(stepId, step.depends_on.filter((id) => ids.has(id)));
+    }
+    // Three-colour DFS detects dependency cycles.
+    const states = new Map();
+    const visit = (id) => {
+      const state = states.get(id) ?? 0;
+      if (state === 1) return true;
+      if (state === 2) return false;
+      states.set(id, 1);
+      let cycle = false;
+      for (const dependency of graph.get(id) ?? []) if (visit(dependency)) cycle = true;
+      states.set(id, 2);
+      return cycle;
+    };
+    for (const id of graph.keys()) {
+      if (visit(id)) { errors.push('plan dependencies contain a cycle'); break; }
     }
   }
   if (input.human_confirmation != null) {
