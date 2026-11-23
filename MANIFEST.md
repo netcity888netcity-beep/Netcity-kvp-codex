@@ -300,6 +300,14 @@ NetCity не является обычным экранным интерфейс
 
 ---
 
+## XIV. Основа контрактов Spatial Interpreter — Stage A
+
+В `dashboard/src/architect/SpatialContracts.js` добавлена первая framework-neutral основа версионируемых контрактов Intent, Plan, Capability и Representation, а также in-memory Capability Registry. Тесты описаны в `SpatialContracts.test.js`.
+
+**Статус:** IN DEVELOPMENT. Это валидация структуры данных, а не исполнение, авторизация или интеграция с KVP. Контракты пока не подключены к текущим ArchitectRuntime / IntentRouter и Spatial Engine. Подробности и следующие задачи — в разделе 16 [SPATIAL_INTERPRETER_SPEC.md](docs/SPATIAL_INTERPRETER_SPEC.md).
+
+---
+
 ## История изменений
 
 - **1.1 · 23 ноября 2026:** уточнена целевая парадигма Spatial Engine / AR HUD; закреплены представления вместо универсальных виджетов, первичность физического мира, контекстное появление информации, смысловая организация слоёв, правила пространственной композиции и честное разделение реализованного и целевого.
