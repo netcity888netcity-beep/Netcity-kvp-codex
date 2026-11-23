@@ -302,9 +302,9 @@ NetCity не является обычным экранным интерфейс
 
 ## XIV. Основа контрактов Spatial Interpreter — Stage A
 
-В `dashboard/src/architect/SpatialContracts.js` добавлена первая framework-neutral основа версионируемых контрактов Intent, Plan, Capability и Representation, а также in-memory Capability Registry. Тесты описаны в `SpatialContracts.test.js`.
+В `dashboard/src/architect/SpatialContracts.js` добавлена framework-neutral основа версионируемых контрактов Intent, Plan, Capability и Representation, а также in-memory Capability Registry. Проверка плана обнаруживает неизвестные зависимости, самозависимости и циклы; при переданном реестре сверяет операцию шага с операцией зарегистрированной Capability. Регрессионные случаи добавлены в `SpatialContracts.test.js`.
 
-**Статус:** IN DEVELOPMENT. Это валидация структуры данных, а не исполнение, авторизация или интеграция с KVP. Контракты пока не подключены к текущим ArchitectRuntime / IntentRouter и Spatial Engine. Подробности и следующие задачи — в разделе 16 [SPATIAL_INTERPRETER_SPEC.md](docs/SPATIAL_INTERPRETER_SPEC.md).
+**Статус:** IN DEVELOPMENT. Это валидация структуры данных, а не исполнение, авторизация или интеграция с KVP. Контракты пока не подключены к текущим ArchitectRuntime / IntentRouter и Spatial Engine. Тесты написаны, но ещё не запускались; прохождение не заявляется. Команды проверки находятся в `dashboard/package.json`. Подробности — в разделе 16 [SPATIAL_INTERPRETER_SPEC.md](docs/SPATIAL_INTERPRETER_SPEC.md).
 
 ---
 
