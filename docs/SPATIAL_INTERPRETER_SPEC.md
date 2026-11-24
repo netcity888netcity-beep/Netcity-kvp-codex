@@ -583,3 +583,47 @@ Next Stage A tasks:
 3. Introduce a deterministic planner that converts validated intents into validated proposals without executing them.
 4. Extend the bridge only after planner semantics and layer context are agreed; preserve the legacy router.
 5. Only after these checks, design the KVP authorization integration as a separate stage.
+
+
+---
+
+## 17. Deterministic Spatial Planner — Stage B
+
+**Статус:** IN DEVELOPMENT. Реализация находится в `dashboard/src/architect/SpatialPlanner.js`. Этот статус не означает, что тесты или сборка выполнены.
+
+### 17.1. Детерминированный контракт выбора
+
+`DeterministicSpatialPlanner` не выводит маршрут из естественного языка и не использует эвристики. Он ищет только точное совпадение тройки:
+
+- `intent.intent.goal`;
+- `requested_outcome.kind`;
+- полного массива `intent.intent.domain` с сохранением порядка элементов.
+
+Каталог маршрутов передаётся явно при создании Planner. Необъявленные маршруты не существуют. Пустой каталог не создаёт планов. Дублирующиеся точные ключи маршрутов отклоняются.
+
+### 17.2. Условия построения плана
+
+До формирования предложения Planner:
+
+1. валидирует Spatial Intent;
+2. находит ровно один точный маршрут;
+3. проверяет, что каждая capability маршрута присутствует в переданном Capability Registry;
+4. повторно валидирует каждую запись capability;
+5. сверяет operation шага с operation capability;
+6. формирует план и валидирует его через `validateSpatialPlan`.
+
+При неизвестном маршруте, отсутствующей или невалидной capability, несовпадении операции либо невалидном плане результат — `NO_PLAN`. Частичный план не возвращается.
+
+### 17.3. Полномочия и граница исполнения
+
+Каждый сформированный шаг содержит обязательное требование KVP-авторизации (`authorization.required = true`, `authorization.authority = "KVP"`). Это декларация требования, а не выданное разрешение.
+
+Planner не вызывает KVP policy gate и не принимает решений об авторизации. Он также не вызывает `IntentRouter`, адаптеры, AGENT SWARM или Spatial Engine и не исполняет операции. Следующий исполнительный контур обязан отдельно проверить полномочия до любого привилегированного dispatch.
+
+### 17.4. Неизменяемость реестра
+
+`CapabilityRegistry.register()` сохраняет отделённый snapshot записи и рекурсивно замораживает вложенные plain objects и arrays. `get()` возвращает этот неизменяемый snapshot; `list()` возвращает новый массив ссылок на неизменяемые записи. Регистрация остаётся metadata-only и не вызывает адаптер.
+
+### 17.5. Ограничения и критерии проверки
+
+Реализация не содержит встроенного набора продуктовых маршрутов: допустимые маршруты должны быть явно объявлены конфигурацией. Это предотвращает неявное расширение возможностей. Автоматические тесты для Stage B не добавлялись и не запускались; сборка не запускалась. Следовательно, реализация пока не имеет подтверждения испытаниями.

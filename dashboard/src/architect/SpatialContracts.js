@@ -200,6 +200,28 @@ export function validateRepresentation(input) {
 }
 
 /**
+ * Freeze a detached descriptor snapshot recursively. Capability descriptors
+ * are metadata only; they never invoke an adapter.
+ */
+function deepFreezeSnapshot(value, seen = new WeakSet()) {
+  if (value === null || typeof value !== 'object') return value;
+  if (seen.has(value)) return value;
+  seen.add(value);
+
+  const prototype = Object.getPrototypeOf(value);
+  if (!Array.isArray(value) && prototype !== Object.prototype && prototype !== null) {
+    throw new TypeError('capability descriptors must contain only plain objects and arrays');
+  }
+  for (const key of Reflect.ownKeys(value)) {
+    if (typeof key !== 'string') {
+      throw new TypeError('capability descriptors must not contain symbol keys');
+    }
+    deepFreezeSnapshot(value[key], seen);
+  }
+  return Object.freeze(value);
+}
+
+/**
  * Small in-memory registry for validated capability descriptors.
  * Registration is metadata only; it never invokes an adapter.
  */
@@ -212,7 +234,7 @@ export class CapabilityRegistry {
     if (this.#entries.has(capability.id)) {
       return fail('capability already registered: ' + capability.id);
     }
-    this.#entries.set(capability.id, Object.freeze(structuredClone(capability)));
+    this.#entries.set(capability.id, deepFreezeSnapshot(structuredClone(capability)));
     return pass();
   }
 
