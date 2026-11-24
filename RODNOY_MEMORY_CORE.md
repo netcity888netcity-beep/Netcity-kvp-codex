@@ -274,3 +274,48 @@ ArchitectRuntime. Это отдельный контур; он не означа
 - Эти решения и модели зафиксированы как архитектурное проектирование на 2026-11-24. Код, схемы протокола, миграции, криптографические реализации, тесты, сборка и production-интеграция не выполнялись и не подтверждены.
 - Planner остаётся только в ветке work/spatial-planner; никаких merge в рамках этой записи нет.
 - Обновление этой записи касается только файлов памяти RODNOY_MEMORY_CORE.md и COUNSELOR_MEMORY_CORE.md. Не изменять код, тесты, IntentRouter.js, gh-pages или иные файлы без отдельного разрешения.
+
+
+## Trust Root Registry v0.1 / резервные копии репозитория — 2026-11-24
+
+### Trust Root Registry Specification v0.1
+
+- Документ: `docs/TRUST_ROOT_REGISTRY_SPEC.md`, ветка `work/spatial-planner`.
+- Коммит документа: `25e9f06c29256093db445435893fb9d6a2696f8d` (`docs: add Trust Root Registry v0.1 specification`).
+- Проверено повторным чтением GitHub: blob SHA `2d6d868cdab16e8985e0b238e097f2a15c22004d`, размер 21600 bytes.
+- Статус: `TARGET / ARCHITECTURE PROPOSAL`. Это спецификация целевой архитектуры, а не доказательство реализации TRR, root store, bootstrap ceremony, rotation, revocation или recovery.
+- TRR — независимый логический контур управления разрешёнными trust roots, производителями, CA и источниками attestation. Trust Core потребляет и проверяет данные TRR; Architect, Planner, Agent Swarm и производитель устройства не могут единолично менять доверенные корни.
+- Зафиксированы Root Record и состояния `PENDING`, `ACTIVE`, `SUSPENDED`, `REVOKED`, `EXPIRED`, `RETIRED`; Root Bootstrap; подписанный Change Package; процедуры добавления, изменения, ротации, приостановки и отзыва корней.
+- Критические изменения используют Dual Control: human approval плюс независимая техническая проверка подписи, целостности, версии, происхождения, совместимости и допустимости. Подпись подтверждает происхождение/целостность, но сама по себе не доказывает безопасность.
+- Разделены rollback программного deployment и rollback trust state: нельзя откатывать состояние корней так, чтобы оживить отозванный или скомпрометированный root (anti-rollback).
+- Описаны cache/freshness и offline поведение, Recovery of Registry Control, интеграция с Trust Core/KVP, Audit / Provenance, threat model и требования к тестам.
+- Открытые вопросы: bootstrap ceremony; recovery threshold/factors; HSM и защищённое хранилище; форматы и криптоалгоритмы; сроки распространения отзыва и cache TTL; monotonic anchor; emergency revocation authority; судьба исторических evidence после отзыва root; независимый verifier/audit sink.
+- Следующий логичный проектный этап: **Trust Root Bootstrap Ceremony** — спроектировать первоначальное создание и ввод корневого доверия, не переходя к реализации без отдельного согласования.
+
+### Device Trust Attestation Specification v0.1 — состояние документа
+
+- Документ: `docs/DEVICE_TRUST_ATTESTATION_SPEC.md`, ветка `work/spatial-planner`.
+- Ранее зафиксированный коммит: `8332961102a255be732e952c4f197a03baf26584` (`8332961`); повторное чтение в текущем ходе подтвердило существование документа, blob SHA `062e45dbb0b5a60cf6a385c88e9b47824b04d607`, размер 29886 bytes.
+- Статус документа: `TARGET / ARCHITECTURE PROPOSAL`; реализация и тестирование не подтверждены.
+- В документе описывается Hybrid Attestation, уровни D1/D2/D3, независимый TRR, challenge/nonce, freshness/TTL, подписи и chain validation, результаты `VERIFIED` / `INSUFFICIENT` / `REJECTED`, downgrade/quarantine, Restricted Offline Mode, KVP integration и Audit / Provenance.
+
+### Резервные копии ZIP — подтверждение пользователя
+
+- 2026-11-24 пользователь подтвердил, что скачал ZIP-снимки всех восьми веток репозитория.
+- Это резервные снимки файлов веток, **не полный Git mirror и не архив всей Git-истории**. Полный Git backup (`git clone --mirror` / `git bundle --all`) в этой среде не создавался и не подтверждён.
+- Снимки веток были предложены для следующих refs на момент проверки:
+  - `main`: `e47d34553d457af3bff5534aa22e416e56083ff0`
+  - `work/spatial-planner`: `25e9f06c29256093db445435893fb9d6a2696f8d`
+  - `feat/kvp-command-bridge`: `ccf916b53d63627a80bdb8a00cd0fae9a8f00f24`
+  - `feat/spatial-engine-core`: `169a6197a817acae5b63d740694443c88ed6942e`
+  - `codex/builders-call`: `3c4aa7d1ac1b85fd1a01a55be0695d194c531dc1`
+  - `gh-pages`: `3e7b17559ca79ed0786907e5436df0d9fb3dcf70`
+  - `netcity888netcity-beep-patch-1`: `4ad04ebf5020e6d66c8a88b16e866dfc13763187`
+  - `netcity888netcity-beep-patch-2`: `4ad04ebf5020e6d66c8a88b16e866dfc13763187`
+- Эти SHA — состояние refs на момент выдачи ZIP-ссылок; перед будущим восстановлением/сравнением веток нужно заново проверить актуальные heads.
+
+### Границы работ и разрешений
+
+- Обновление памяти выполняется только в `work/spatial-planner`; `main`, код, тесты, IntentRouter.js, gh-pages и другие ветки не затрагиваются.
+- ZIP-снимки скачаны пользователем; это не означает, что полный Git backup создан.
+- Trust Root Bootstrap Ceremony пока не спроектирована и не утверждена. Продолжать с архитектурного проектирования и согласования решений; не писать код и не делать новые коммиты/изменения за пределами явно разрешённого объёма.
