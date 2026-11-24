@@ -70,11 +70,28 @@ ArchitectRuntime. Это отдельный контур; он не означа
   `dashboard/src/architect/IntentRouter.js` не менялся в рамках этого этапа.
   Bridge не генерирует Plan, не вызывает `routeIntent`, не авторизует и не
   исполняет действия.
-- **Безопасность и незавершённые интеграции**: контрактная валидация не равна
-  KVP authorization. На момент этой записи ещё не подключены полноценный
-  contract-based Planner, обязательная KVP policy/authorization gate,
-  исполнитель capability adapters, журнал provenance и мост материализации
-  в Spatial Engine. Не считать их реализованными.
+- **Planner (Stage B, отдельная ветка)**: в `work/spatial-planner` добавлен
+  `dashboard/src/architect/SpatialPlanner.js` — построитель предложений по
+  точным заранее объявленным маршрутам `goal + requested_outcome.kind + domain`.
+  Он проверяет зарегистрированные capability descriptors, зависимости и
+  сформированный Plan; при отсутствии точного маршрута или невалидных данных
+  возвращает `NO_PLAN`. План помечает обязательную KVP-авторизацию, но сам
+  её не выполняет. Planner не вызывает IntentRouter, адаптеры, AGENT SWARM или
+  Spatial Engine.
+- **Детерминированность Planner**: коммит `e75e84f` добавил snapshot
+  capability descriptors при создании экземпляра; отсутствующие capabilities
+  также фиксируются как отсутствующие. Изменение Registry после создания не
+  меняет существующий Planner — для обновления нужен новый экземпляр.
+  Порядок доменов значим; строки сравниваются буквально, без trim, смены
+  регистра или Unicode-нормализации.
+- **Тесты Planner**: добавлен `dashboard/src/architect/SpatialPlanner.test.js`
+  с пятью регрессионными тестами. Тесты добавлены, но фактический запуск не
+  подтверждён. Сборка также не запускалась.
+- **Безопасность и незавершённые интеграции**: контрактная валидация и
+  построение предложения не равны KVP authorization. Обязательная KVP
+  policy/authorization gate, исполнение capability adapters, журнал
+  provenance и мост материализации в Spatial Engine не подтверждены как
+  подключённые. Не считать их реализованными.
 - **Файлы**:
   - `dashboard/src/architect/SpatialContracts.js`
   - `dashboard/src/architect/SpatialContracts.test.js`
@@ -141,10 +158,13 @@ ArchitectRuntime. Это отдельный контур; он не означа
   workspace и не перечень всех последних коммитов main.
 - gh-pages: панельный оригинал (`index-Cm58MoD-.js`); main — «Матрешка»
   (согласно последней сохранённой записи; актуальность деплоя отдельно проверять).
-- Spatial Interpreter: контракты v0.1 и неисполняющий bridge добавлены; следующий
-  проектный шаг — безопасное построение детерминированного Plan поверх
-  валидированного Intent, с привязкой только к реально зарегистрированным
-  capabilities и без обхода KVP authorization.
+- Spatial Interpreter: контракты v0.1 и неисполняющий ArchitectRuntime bridge
+  добавлены. Planner Stage B существует в отдельной ветке `work/spatial-planner`
+  (коммиты `f5aa2ed` и `e75e84f`); в `main` он не интегрирован.
+  Следующий шаг — реальный запуск `npm run test:architect` из `dashboard/`,
+  разбор результатов и проверка сборки. До запуска не объявлять тесты
+  пройденными. KVP authorization, provenance, capability execution и Spatial
+  Engine materialization остаются отдельными незавершёнными интеграциями.
 
 ## Как вести эту память
 
