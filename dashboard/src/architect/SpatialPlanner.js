@@ -24,11 +24,11 @@ function freezeSnapshot(value, seen = new WeakSet()) {
   seen.add(value);
   const prototype = Object.getPrototypeOf(value);
   if (!Array.isArray(value) && prototype !== Object.prototype && prototype !== null) {
-    throw new TypeError('route definitions must contain only plain objects and arrays');
+    throw new TypeError('snapshot values must contain only plain objects and arrays');
   }
   for (const key of Reflect.ownKeys(value)) {
     if (typeof key !== 'string') {
-      throw new TypeError('route definitions must not contain symbol keys');
+      throw new TypeError('snapshot values must not contain symbol keys');
     }
     freezeSnapshot(value[key], seen);
   }
@@ -36,6 +36,7 @@ function freezeSnapshot(value, seen = new WeakSet()) {
 }
 
 function exactRouteKey(goal, outcome, domain) {
+  // Domain is an ordered sequence: order is intentionally significant.
   return JSON.stringify([goal, outcome, domain]);
 }
 
@@ -95,9 +96,12 @@ function noPlan(reason, errors = []) {
  * @param {object} options
  * @param {{get(id: string): object|null}} options.capabilityRegistry
  * @param {Array<object>} options.routes Exact route declarations. No implicit routes are added.
+ *
+ * Capability descriptors are captured once during construction. To observe a
+ * registry update, construct a new Planner instance.
  */
 export class DeterministicSpatialPlanner {
-  #capabilityRegistry;
+  #capabilitySnapshots = new Map();
   #routes = new Map();
 
   constructor({ capabilityRegistry, routes = [] } = {}) {
@@ -106,7 +110,7 @@ export class DeterministicSpatialPlanner {
     }
     if (!Array.isArray(routes)) throw new TypeError('routes must be an array');
 
-    this.#capabilityRegistry = capabilityRegistry;
+    const capabilityIds = new Set();
     for (const sourceRoute of routes) {
       const routeErrors = validateRoute(sourceRoute);
       if (routeErrors.length) {
@@ -118,6 +122,17 @@ export class DeterministicSpatialPlanner {
         throw new TypeError('duplicate exact route: ' + key);
       }
       this.#routes.set(key, route);
+      for (const step of route.steps) capabilityIds.add(step.capability);
+    }
+
+    // Capture each referenced registry entry exactly once. Missing entries are
+    // snapshotted as missing too, so later registration cannot change this instance.
+    for (const id of capabilityIds) {
+      const source = capabilityRegistry.get(id);
+      const snapshot = source == null
+        ? null
+        : freezeSnapshot(structuredClone(source));
+      this.#capabilitySnapshots.set(id, snapshot);
     }
   }
 
@@ -135,7 +150,7 @@ export class DeterministicSpatialPlanner {
 
     const capabilities = [];
     for (const step of route.steps) {
-      const capability = this.#capabilityRegistry.get(step.capability);
+      const capability = this.#capabilitySnapshots.get(step.capability);
       if (!capability) return noPlan('CAPABILITY_NOT_REGISTERED', [step.capability]);
       const capabilityValidation = validateCapability(capability);
       if (!capabilityValidation.valid) {
