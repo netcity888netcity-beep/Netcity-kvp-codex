@@ -499,3 +499,88 @@ ArchitectRuntime. Это отдельный контур; он не означа
 - Rust-модули `recovery.rs` / `itvr.rs`, тестовые файлы, FROST/DKG, HSM/TPM integration и production deployment не создавались.
 - Следующий рекомендуемый этап: отдельный аудит матрицы на пробелы, противоречия и неоднозначные критерии до проектирования Rust-каркаса.
 - Никакие разрешения на код, тестовую реализацию, аппаратную настройку или дальнейшие изменения репозитория этим этапом не выдаются.
+
+
+## Revocation Commit Protocol v0.1 / Recovery StateMachine::advance() Concept v0.3 — 2026-11-25
+
+Пользователь прямо разрешил сохранить согласованные архитектурные решения и актуальную память в репозитории. Работа выполнена только в `work/spatial-planner`; `main` не изменялась. Код и тесты не создавались.
+
+### Созданные документы
+
+- `docs/REVOCATION_COMMIT_PROTOCOL_SPEC.md` — Revocation Commit Protocol v0.1.
+- `docs/RECOVERY_STATE_MACHINE_ADVANCE_CONCEPT.md` — Recovery StateMachine::advance() Concept v0.3, предварительная Rust module tree и границы API.
+- `MANIFEST.md`, раздел XVIII — индекс этапа и статус.
+
+### Revocation Commit Protocol v0.1 — согласовано
+
+- Авторитетный владелец `revocation_epoch` — только KVP Authorization Gate. Anchor хранит последнее подтверждённое состояние, но не является источником полномочий.
+- Для критических Root Authority transitions требуется точное равенство `GrantEpoch == CurrentEpoch`. Старый epoch → DENY; epoch выше текущего → INDETERMINATE. Epoch равенство не заменяет проверку scope, Grant, audience, expiry, nonce, policy и evidence.
+- Принят гибрид A+B: синхронный PREPARE с KVP, долговечная scoped reservation и Anchor Commit с явной точкой линеаризации.
+- PREPARE: KVP долговечно записывает PreparedCommitRecord до выдачи PrepareAck; Anchor сохраняет свою Prepared-запись до Commit.
+- COMMIT: Anchor непосредственно перед атомарной записью проверяет Prepare, Grant binding, epoch, fencing, scope, expected state/counter и отсутствие closure/abort.
+- COMPLETE: Anchor receipt проверяется KVP; KVP completion и Audit Completion — отдельные фазы. Anchor COMMITTED не означает, что вся транзакция COMPLETED.
+- `ANCHOR_COMMIT_LINEARIZATION_POINT` — атомарная долговечная фиксация нового Anchor state + monotonic counter.
+- Отзыв ставит scoped `REVOCATION_PENDING`, блокирует новые Grant/Prepare в scope, разрешает все конфликтующие Prepared операции и только после этого продвигает epoch.
+- Допустимые порядки: `PREPARE ≺ COMMIT ≺ REVOCATION` или `PREPARE ≺ ABORT ≺ REVOCATION`. Нельзя допустить Commit по старому Prepare после завершённого отзыва.
+- `ForceAbortPrepare` и Commit должны сериализоваться внутри Anchor. ForceAbort первым → durable closure; Commit первым → Commit сохраняется; неизвестный порядок → INDETERMINATE.
+- TTL не доказывает отсутствие Commit. Снять reservation можно только после проверенного NOT_COMMITTED + closure proof или после подтверждённого Commit и завершения процедуры.
+- KVP Journal Recovery сверяет Anchor и Audit; потеря KVP журнала не отменяет Commit.
+- Потеря Anchor Journal при сохранном HSM state/hash/counter переводит Anchor в AMNESIA: без восстановленного контекста новые Commit запрещены.
+- При partition между KVP, Anchor или Audit критический переход не завершается успешно; fail-closed / INDETERMINATE. Уже линеаризованный Commit не отменяется последующей недоступностью Audit.
+- Зафиксированы инварианты RCP-REV-01…10.
+
+### Четыре аварийных сценария — ответы пользователя
+
+1. KVP падает после PREPARE: после рестарта проверяет Anchor; COMMITTED → восстановление; доказанный NOT_COMMITTED + closure → ABORTED; неизвестность → RECONCILIATION_REQUIRED.
+2. Anchor падает во время атомарного Commit: HSM/Anchor обязан обеспечить проверяемый All-or-Nothing результат; старое состояние + closure → ABORTED; новое состояние + receipt → COMMITTED; иначе INDETERMINATE. Это требование к будущему конкретному backend, не подтверждённая гарантия выбранного HSM.
+3. Revocation vs Commit: Commit раньше точки линеаризации сохраняется и предшествует финальному отзыву; отзыв/ForceAbort раньше закрывает Prepare и запрещает Commit. Epoch нельзя продвигать при unresolved Prepare.
+4. Anchor после Prepare TTL: проверяет durable Journal/closure; EXPIRED/CLOSED не может быть повторно использован. Потеря Journal → AMNESIA, Commit запрещены, требуется сверка KVP/Audit.
+
+### Adversarial Audit advance() v0.3 — пользовательские сценарии
+
+- Parallel Coordinators: durable unique reservation/CAS; один получает reservation; второй получает ExistingTransaction/Indeterminate при том же ID+digest или Blocked conflict при другом digest.
+- Stale Fencing Token: Anchor обязан отвергать token ниже последнего активированного у Anchor.
+- Replay: completed same ID+digest → исходный receipt; другой digest → Blocked; in-flight → Indeterminate.
+- Stuck Prepare / Journal loss: TTL не снимает блокировку; только доказанный Commit или NOT_COMMITTED + closure; потеря журнала → INDETERMINATE.
+
+### StateMachine::advance() Concept v0.3 — принято пользователем
+
+Пользователь принял концепт v0.3 и согласовал:
+- модульную архитектуру Coordinator, State Machine, Evidence Engine, Quorum Verifier, Time Validator, Canonical Engine, Audit Engine, KVP Authorization Gate, Hybrid Anchor;
+- отдельные типизированные контракты TransitionRequest, ReservationProof, EvidenceBundle/ValidatedEvidence, KvpTransitionGrant, PreparedCommitRecord/PrepareAck, AnchorCommitOutcome/VerifiedAnchorReceipt;
+- idempotency по transition_id + digest;
+- durable reservation, fencing, CAS и запрет внешних вызовов под Mutex;
+- Audit Intent до Anchor Commit и Audit Completion после него; при ошибке после Commit — reconciliation, не rollback;
+- локальный snapshot не является доказательством Anchor state;
+- RecoveryBlocked — остановка, не обычный переход и не снятие lock;
+- 11 этапов Recovery Ceremony; ROOT_CONTROL_FROZEN и OWNER_RECOVERY_LOCK независимы;
+- предварительный псевдокод advance() и reconciliation.
+
+### Evidence / Authorization уточнения
+
+- `ValidatedEvidence` — opaque/private, создаётся только закрытым валидатором; `EvidenceCheckResult` типизированный Valid/Invalid/Indeterminate.
+- `ControlDomainEvidence` несёт source/provenance digest, observed_at, valid_until, policy_version.
+- Independence outcomes: INDEPENDENT, CONFLICT_DETECTED, INSUFFICIENT_EVIDENCE, INDETERMINATE; assessment связан с точным составом и policy.
+- VerifiedCouncilQuorum связан с Manifest, roster, key versions, verified votes, independence assessment и package digest; порог 3-of-5 — минимум 3 уникальных действительных голосов.
+- FrostSessionEvidence связывает DKG config, group key, session, commitments, participation proofs, aggregate signature и package digest; secret nonces/shares не сохраняются.
+- R4 attestation требует актуального ITVR status и проверки отзыва/ключа в момент критического решения.
+- KvpTransitionGrant — только положительный Grant; matches() не заменяет полноценную проверку полномочий.
+- Подписанный EpochAttestation сам по себе не закрывает TOCTOU; обязателен Revocation Commit Protocol.
+
+### Предварительная Rust структура
+
+Предложены модули `types`, `canonical`, `time`, `evidence`, `authorization`, `reservation`, `anchor`, `audit`, `state_machine`, `coordinator`, `recovery`. Публичный фасад должен экспортировать ограниченный API через `pub use`; приватные конструкторы Verified-типа не должны быть доступны Coordinator. Точная Rust module privacy/циклические зависимости ещё требуют проверки.
+
+### Три уточнения, предложенные последним аудитом — НЕ утверждены отдельно
+
+1. **Fencing Activation Protocol:** новая generation становится активной только после durable установки в Anchor и подписанного FencingActivationReceipt. Простая выдача нового token в KVP не инвалидирует старый token у Anchor.
+2. **AnchorCommitted != Completed:** при потере KVP Journal и доказанном Anchor Commit, но отсутствующем Audit Completion, восстановить как COMPLETION_PENDING, а не COMPLETED.
+3. **ForceAbort vs Commit:** явная сериализация внутри Anchor; ForceAbort первым → durable closure; Commit первым → Commit сохраняется; неизвестный порядок → INDETERMINATE.
+
+Эти три уточнения сохранены как pending design decisions, не как замороженный Interface Baseline.
+
+### Граница доказанности и следующий шаг
+
+- Все документы — архитектурные предложения/согласованные концепты. Rust Skeleton, lib.rs/mod.rs implementation, тесты, TLA+/PlusCal model, FROST/DKG, HSM/TPM integration, storage/network integration и production deployment не создавались.
+- Adversarial Audit — логический разбор сценариев, не выполненные тесты и не формальное доказательство.
+- Следующий этап: утвердить/уточнить три pending решения; проверить конкурентные interleavings (TLA+/PlusCal); после этого подготовить Interface Baseline v0.1. Код и тесты — только по отдельному разрешению.
