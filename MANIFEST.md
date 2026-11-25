@@ -390,3 +390,54 @@ NetCity не является обычным экранным интерфейс
 
 ### Граница доказанности
 Все сценарии имеют статус **PLANNED**. Матрица не является отчётом о выполнении тестов. Rust-код, тестовые файлы, FROST/DKG, HSM/TPM integration, fuzzing, coverage и production deployment не создавались и не подтверждены. Следующий этап — аудит самой матрицы до проектирования Rust-каркаса.
+
+
+---
+
+## XVIII. Revocation Commit Protocol & Recovery StateMachine — Concept v0.3 (2026-11-25)
+
+**Статус:** APPROVED ARCHITECTURAL DESIGN INPUT / CONCEPT. Документы:
+- [Revocation Commit Protocol v0.1](docs/REVOCATION_COMMIT_PROTOCOL_SPEC.md)
+- [Recovery StateMachine::advance() Concept v0.3](docs/RECOVERY_STATE_MACHINE_ADVANCE_CONCEPT.md)
+
+### Revocation Commit Protocol v0.1
+
+- Единственный владелец `revocation_epoch` — KVP Authorization Gate; Anchor хранит последнее подтверждённое состояние и доказательства, но не управляет полномочиями.
+- Для критических Root Authority transitions требуется `GrantEpoch == CurrentEpoch`; меньший epoch → DENY, больший → INDETERMINATE.
+- Принята схема 2PC: KVP durable PREPARE reservation → подписанный PrepareAck → Anchor durable PreparedCommitRecord → атомарный Anchor COMMIT → KVP COMPLETE → Audit Completion.
+- Подписанная EpochAttestation и async push сами по себе не закрывают TOCTOU.
+- Точка линеаризации: атомарная фиксация Anchor state + monotonic counter (ANCHOR_COMMIT_LINEARIZATION_POINT).
+- Отзыв устанавливает scoped `REVOCATION_PENDING`, блокирует новые Grant/Prepare в scope и не продвигает epoch до разрешения всех конфликтующих Prepared transactions.
+- Допустимые порядки: `PREPARE ≺ COMMIT ≺ REVOCATION` или `PREPARE ≺ ABORT ≺ REVOCATION`.
+- TTL не доказывает отсутствие Commit. Reservation снимается только при проверенном NOT_COMMITTED + окончательном closure proof либо после подтверждённого Commit/completion.
+- ForceAbortPrepare и Commit должны сериализоваться внутри Anchor; closure сохраняется durable tombstone.
+- KVP Journal Recovery сверяет Anchor и Audit. Anchor Journal loss → AMNESIA, новые Commit запрещены до восстановления истории.
+- При сетевом partition критический переход не завершается успешно; INDETERMINATE/fail-closed. Уже линеаризованный Commit не отменяется из-за последующей Audit недоступности.
+- Инварианты RCP-REV-01…10 внесены в отдельную спецификацию.
+
+### Recovery StateMachine::advance() Concept v0.3
+
+- Принята модульная архитектура Coordinator, State Machine, Evidence Engine, Quorum Verifier, Time Validator, Canonical Engine, Audit Engine, KVP Authorization Gate и Hybrid Anchor.
+- Разделены TransitionRequest, ReservationProof, KvpTransitionGrant, PreparedCommitRecord/PrepareAck, AnchorCommitOutcome/VerifiedAnchorReceipt и Audit Intent/Completion.
+- Внутренний TransitionPhase отделён от публичного RecoveryState.
+- Согласованы idempotency, durable reservation, fencing, отсутствие внешних вызовов под Mutex, CAS, двухфазный Audit и reconciliation.
+- `ANCHOR_COMMITTED` не равен `COMPLETED`; завершение требует KVP и Audit Completion.
+- Reconciliation не выдаёт полномочий и не изменяет Root Authority.
+- 11 этапов Recovery Ceremony сохранены; ROOT_CONTROL_FROZEN и OWNER_RECOVERY_LOCK независимы.
+- Предварительная Rust crate/module tree и минимальный публичный фасад приведены в отдельном Concept документе.
+
+### Adversarial audit
+
+Согласованы сценарии: параллельные Coordinator (durable unique reservation/CAS), replay, stale fencing token, stuck Prepare, KVP Journal loss, Anchor Journal AMNESIA, ForceAbort vs Commit, network partition. Неопределённость не превращается в ALLOW.
+
+### Уточнения, ещё не утверждённые как интерфейсный baseline
+
+- Fencing Activation Protocol: новая fencing generation становится активной только после durable Anchor activation и FencingActivationReceipt.
+- Разделение AnchorCommitted и Completed при восстановлении KVP/Audit.
+- Явная сериализация ForceAbortPrepare и Commit внутри Anchor.
+- Epoch scope (global / Principal / Authority / revocation domain), HSM API, storage и transport остаются открытыми.
+
+### Граница доказанности
+
+Это архитектурные документы и псевдокод. Rust Skeleton, lib.rs/mod.rs implementation, tests, formal verification, FROST/DKG, HSM/TPM integration и production deployment не создавались. StateMachine v0.3 не является математически доказанной или протестированной системой. Следующий этап — закрыть pending refinements, формализовать конкурентные interleavings (TLA+/PlusCal), затем утвердить Interface Baseline v0.1.
+
