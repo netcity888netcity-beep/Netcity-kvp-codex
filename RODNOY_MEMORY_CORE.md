@@ -274,3 +274,46 @@ ArchitectRuntime. Это отдельный контур; он не означа
 - Эти решения и модели зафиксированы как архитектурное проектирование на 2026-11-24. Код, схемы протокола, миграции, криптографические реализации, тесты, сборка и production-интеграция не выполнялись и не подтверждены.
 - Planner остаётся только в ветке work/spatial-planner; никаких merge в рамках этой записи нет.
 - Обновление этой записи касается только файлов памяти RODNOY_MEMORY_CORE.md и COUNSELOR_MEMORY_CORE.md. Не изменять код, тесты, IntentRouter.js, gh-pages или иные файлы без отдельного разрешения.
+
+## Отклонения и вскрытие ветки work/spatial-planner — 2026-11-25
+
+### 1. Отклонения от правила push (санкции нет)
+
+- Санкция Архитектора на 7 коммитов в main после dfa1606 (64d0c3a → e47d3455, только память) — не подтверждена.
+- Санкция Архитектора на коммиты в work/spatial-planner (27 коммитов относительно main) — не подтверждена.
+- Санкция на dfa1606 — нет (записано ранее, 64d0c3a).
+- Не откатывать ни main, ни work/spatial-planner без отдельного приказа Архитектора.
+
+### 2. Вскрытие неанонсированного кода (read-only, 2026-11-25)
+
+- В work/spatial-planner обнаружены dashboard/src/architect/SpatialPlanner.js (194 строки, исполняемый код, статус IN DEVELOPMENT) и dashboard/src/architect/SpatialPlanner.test.js (5 тестов на node:test), в отчётах ранее не анонсированы.
+- Добавлены коммитами: f5aa2ed5 (Planner, 2026-11-24 10:28:59 UTC) и e75e84f4 (тесты + snapshot fix, 2026-11-24 10:34:12 UTC). Автор GitHub — netcity888netcity-beep.
+- Что делает Planner: строит только PROPOSED-план по заранее сконфигурированным точным маршрутам (goal + outcome + domain). Валидирует Intent, capability, plan. Помечает authorization.required = true, authority = 'KVP'.
+- Чего не делает: не вызывает KVP, не получает Grant, не вызывает processIntentContract / processIntent / routeIntent, не запускает адаптеры, Agent Swarm или Spatial Engine. Сетевых, файловых, DOM, localStorage, Tauri side effects — не обнаружено.
+- Изменение в существующем контрактном файле: в SpatialContracts.js четыре валидатора (validateSpatialIntent, validateCapability, validateSpatialPlan, validateRepresentation) не изменены; CapabilityRegistry.register() изменён — поверхностная заморозка заменена рекурсивной (deepFreezeSnapshot). Поведение существующего публичного класса затронуто.
+- Запуск тестов: не подтверждён. Доступные PR-associated workflow runs пусты; факт «тесты никогда не запускались» также не доказан.
+
+### 3. Открытый риск (pending, не решён)
+
+- Planner фиксирует snapshot capability descriptors при создании и не обновляет его при отзыве записи в Registry. Это сознательный выбор ради детерминизма (тест №1), но он означает: отзыв capability не инвалидирует уже созданный Planner.
+- Пока Planner только предлагает план — риск ограничен. При любом будущем исполнении обязательна повторная KVP-проверка непосредственно перед исполнением, независимо от snapshot. Snapshot не заменяет KVP authorization.
+- Статус: pending design decision, не замороженный интерфейс.
+
+### 4. Известные расхождения документации
+
+- MANIFEST.md, раздел XV (Deterministic Spatial Planner — Stage B) утверждает «тесты не добавлялись и не запускались». Это устарело: тестовый файл добавлен в e75e84f4. Чинить отдельным коммитом в work/spatial-planner, не в main, по отдельному разрешению.
+- Запись в RODNOY_MEMORY_CORE.md раздела Revocation/StateMachine «Код и тесты не создавались» корректна в привязке к этому этапу, но некорректна при чтении «на всю ветку»: Planner и тест к этому моменту уже существовали.
+
+### 5. Ссылки на SHA
+
+- main на момент записи: e47d34553d457af3bff5534aa22e416e56083ff0.
+- Аудит dfa1606: 64d0c3a7437a2b9f647b96ca568072cec0a4c4c6.
+- Planner: f5aa2ed5e2c22e95b54d243abdb0ed419b556d04.
+- Тесты + snapshot fix: e75e84f49b25d8df339befc44f05e0e5aa0b0863.
+- dfa1606f3c24220827259760377327472fc93f6c — санкции нет, записано в 64d0c3a.
+
+### 6. Границы этого этапа
+
+- Это запись памяти, не изменение кода. Код, тесты, MANIFEST, ветки, gh-pages — не трогаются.
+- Ничего из перечисленного не объявлять исполненным, протестированным или интегрированным.
+
