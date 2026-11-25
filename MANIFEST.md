@@ -358,3 +358,35 @@ NetCity не является обычным экранным интерфейс
 - Старые ключи должны быть отозваны и исключены из доверенной конфигурации; физическое уничтожение всех копий не гарантируется.
 
 **Граница доказанности:** раздел фиксирует архитектуру, а не готовую реализацию. Rust state machine, пороговая криптография, HSM/TPM integration, monotonic anchor, append-only/Merkle log, тесты и production deployment не заявляются как реализованные.
+
+
+---
+
+## XVII. Recovery & ITVR Test Matrix — v0.1
+
+**Статус: APPROVED DESIGN INPUT / PLANNED TESTS.** Полная матрица: [docs/RECOVERY_ITVR_TEST_MATRIX.md](docs/RECOVERY_ITVR_TEST_MATRIX.md).
+
+Матрица формализует будущие проверки трёх связанных контуров:
+- Recovery Council: Root Custody C1–C5, Independent Recovery Council R1–R5, кворумы, замена участников и границы полномочий.
+- Recovery Ceremony Protocol: state machine, Freeze, Manifest Validation, Evidence, Quorum Verification, Root Reconstitution, Audit и снятие блокировок.
+- ITVR Bootstrap & Trust Recovery: Genesis Ceremony, DKG, FROST 2-of-3, Anti-Sybil, Hybrid Anchor, IV rotation, R4 Pending Isolation и восстановление ITVR.
+
+### Состав матрицы
+- 27 сценариев RC-001–RC-027.
+- 49 сценариев RCP-001–RCP-049.
+- 70 сценариев ITVR-001–ITVR-070.
+- 15 сквозных сценариев INT-001–INT-015.
+- Дополнительно: 8 классов adversarial attacks, 8 property-based invariants, Fault Injection и 12 Acceptance Criteria.
+
+### Обязательные свойства
+- Результаты проверок: ALLOW / DENY / INDETERMINATE; неизвестное или непроверенное не даёт ALLOW.
+- Council quorum 3-of-5 и IV Panel threshold 2-of-3 — независимые механизмы; пороги не снижаются при потере участников.
+- Повторные голоса, replay, подмена пакета и Manifest rollback блокируются.
+- Anti-Sybil проверяет фактические домены контроля, а не только разные юридические названия.
+- FROST итоговая подпись сама по себе не раскрывает состав двух signer; проверяемая привязка участников к signing session обязательна в Audit.
+- R4_PENDING не подписывает Attestation; `can_attest=false` не является единственной защитой — KVP Authorization Gate проверяет полномочия независимо.
+- Freeze снимается только после независимой валидации и отдельного разрешения KVP.
+- Невозможность подтвердить Genesis или последнюю достоверную версию Anchor приводит к безопасному отказу.
+
+### Граница доказанности
+Все сценарии имеют статус **PLANNED**. Матрица не является отчётом о выполнении тестов. Rust-код, тестовые файлы, FROST/DKG, HSM/TPM integration, fuzzing, coverage и production deployment не создавались и не подтверждены. Следующий этап — аудит самой матрицы до проектирования Rust-каркаса.
