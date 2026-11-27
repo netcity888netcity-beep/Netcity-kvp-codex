@@ -145,3 +145,12 @@ NetCity — это не приложение. Это **Убежище для с�
 - Эти решения и модели зафиксированы как архитектурное проектирование на 2026-11-24. Код, схемы протокола, миграции, криптографические реализации, тесты, сборка и production-интеграция не выполнялись и не подтверждены.
 - Planner остаётся только в ветке work/spatial-planner; никаких merge в рамках этой записи нет.
 - Обновление этой записи касается только файлов памяти RODNOY_MEMORY_CORE.md и COUNSELOR_MEMORY_CORE.md. Не изменять код, тесты, IntentRouter.js, gh-pages или иные файлы без отдельного разрешения.
+
+
+## Canonical project state handoff — 2026-11-27
+
+Read `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md` as the current consolidated handoff. It captures the latest Compute Node and Mobile Spatial Workstation targets, KVP Runtime Contract priorities, Authorization/Trust/Identity/Recovery decisions, ZONT field case, Endcode + ChatGPT workflow, and current funding/growth status.
+
+Important: these are not blanket implementation claims. The Compute Node is a target configuration, the 8 TB RAM and D2C configuration remain unverified, proposed latency/FPS values are acceptance goals only, Planner tests/build are not confirmed run, and ZONT is not yet integrated into NetCity. The illustration register is complete as an inventory, but original binary assets are not yet confirmed in GitHub. Continue to distinguish project design, implementation, verification and hardware proof.
+
+The user's current instruction authorizes updating repository memory and project documentation only. It does not authorize code changes, merges, deployment, external publication, vendor contact, purchases or money movement. Endcode is an available phone-based execution agent; repository memory is the cross-session source of truth.
