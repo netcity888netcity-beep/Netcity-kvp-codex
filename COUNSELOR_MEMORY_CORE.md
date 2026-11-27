@@ -161,3 +161,9 @@ The user's current instruction authorizes updating repository memory and project
 - `docs/illustrations/` now contains four editable Mermaid diagrams: `NETCITY_RUNTIME_TOPOLOGY.mmd`, `DEVICE_TRUST_AUTHORIZATION.mmd`, `COMPUTE_NODE_POWER_THERMAL.mmd`, and `ZONT_FIELD_INTEGRATION.mmd`; see `docs/illustrations/README.md`.
 - A 22-file ZIP transfer bundle of selected original project illustrations/brand assets was assembled as `NetCity_Illustrations_Transfer_2026-11-27.zip` for local import through Endcode or a working Git clone.
 - The ZIP is not a GitHub upload. Original raster/GIF binaries remain pending import and verification in `docs/illustrations/`; do not claim they are already committed.
+
+
+## KVP Runtime Contract v0.1 draft — 2026-11-27
+
+- First architecture draft is stored at `docs/KVP_RUNTIME_CONTRACT_v0.1_DRAFT.md` (commit `07fd0bf9e1c933884352ddc2867c4ffa5afe469d`). It defines the common event envelope, lifecycle, KVP authorization boundary, scene versioning, offline/reconnect, sync, Agent Runtime, audit/provenance and acceptance-test plan.
+- Status is DRAFT / ARCHITECTURE PROPOSAL only. Open decisions remain; no implementation, schema generation, tests, transport selection or performance proof is claimed.
