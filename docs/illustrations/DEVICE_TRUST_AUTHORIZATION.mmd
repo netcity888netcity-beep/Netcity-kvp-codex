@@ -1,0 +1,25 @@
+flowchart TD
+  D["Device request / event"] --> I["Device Identity Registry<br/>per-device key + status"]
+  I --> E["Trust Attestation<br/>initial / periodic / event / pre-critical"]
+  E --> R{"Evidence result"}
+  R -->|VERIFIED| V["Verified trust evidence"]
+  R -->|INSUFFICIENT| L["Restricted Offline / Limited mode"]
+  R -->|REJECTED| Q["Reject + preserve evidence"]
+  V --> P["KVP Authorization<br/>operation-specific policy check"]
+  P --> G{"Decision"}
+  G -->|ALLOW| X["Execute only granted capability"]
+  G -->|DENY| B["Block operation"]
+  G -->|NEEDS HUMAN| U["Human approval scoped to plan"]
+  U --> P
+  X --> A["Audit / Provenance"]
+  B --> A
+  Q --> A
+  L --> A
+  Z["Revocation / trust downgrade"] -. "invalidate or re-check before execution" .-> P
+  Z -. "device status" .-> I
+  classDef safe stroke:#7DF6D1,stroke-width:1.5px,color:#fff,fill:#0A0F1A;
+  classDef warn stroke:#FFB45E,stroke-width:1.5px,color:#fff,fill:#0A0F1A;
+  classDef reject stroke:#FF6B6B,stroke-width:1.5px,color:#fff,fill:#0A0F1A;
+  class I,E,V,P,X,A safe;
+  class L,U,Z warn;
+  class Q,B reject;
