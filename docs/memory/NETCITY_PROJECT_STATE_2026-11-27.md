@@ -122,16 +122,7 @@ Next design work should define:
 
 This is the next design task, not an implemented protocol.
 
-## 8. Field integration case: ZONT boiler control
-
-User-reported field context (27 Nov 2026):
-- A ZONT controller plus expansion board has previously controlled two common boiler models in a cascade successfully.
-- User reports that control, error handling and telemetry reading worked correctly in that established configuration.
-- Current issue concerns a Climate V2 account binding: the device appears to have been registered under an inaccessible old account; user no longer has its login credentials. User can potentially capture a screenshot showing the old account login.
-- Treat the boiler integration as a candidate NetCity TECH/ENERGY bridge and a real-world telemetry/control case study. Do not imply it is already connected to NetCity/KVP or that the current account-binding issue is solved.
-- Any control integration must be separately authorized, safe-by-default, auditable and fail-safe; no remote actuation without explicit user authority and device-specific safety design.
-
-## 9. Endcode and ChatGPT agent workflow
+## 8. Endcode and ChatGPT agent workflow
 
 - User has an agent on the phone in Endcode that can write/execute code and assist with repository work; user reports ChatGPT is also available there.
 - Endcode may be used as a second execution environment when a task needs local files, dashboards, shell/code execution or repository operations unavailable in the current ChatGPT connector.
@@ -139,7 +130,7 @@ User-reported field context (27 Nov 2026):
 - ChatGPT and Endcode should use the repository as shared durable project state, not rely on chat-only context. After work, write exact commit SHA, changed paths, tests actually run and unresolved issues.
 - No assumption that this ChatGPT cloud session itself migrates to the user's local server. The local Compute Node remains a future deployment target.
 
-## 10. Funding and public project status — as of 2026-11-27
+## 9. Funding and public project status — as of 2026-11-27
 
 - Sponsr project: `https://sponsr.ru/netcity/`; identity verification was completed by the user. Public description positions NetCity as an engineering journal, with two releases per month, and explicitly says the product is in development, not a finished OS.
 - Public Sponsr page did not expose verified subscriber count or revenue in the reviewed session. No new receipts can be inferred from public visibility.
@@ -151,14 +142,14 @@ User-reported field context (27 Nov 2026):
 - Corporate funding channels previously researched (guarantee support, leasing, grants, strategic investor) are leads, not approved financing. Verify company SME status, registration region, age, OKVED, tax status, arrears, financials, ownership and use of funds before asserting eligibility.
 - For Russia, do not suggest cryptocurrency as payment for goods/services; do not suggest evading FSSP restrictions or routing funds through third-party accounts.
 
-## 11. Growth Sprint automation
+## 10. Growth Sprint automation
 
 - Existing automation: `NetCity Growth Sprint`, ID `Automation_835ecdb754fc8191b65e615ad4cc1b10`, daily 7-day sprint, timezone Europe/Amsterdam.
 - Latest known scheduled run on 27 Nov 2026 failed with a generic task error. Do not claim it completed or is a 24/7 agent.
 - A daily scheduled run is not continuous background execution. Continuous operation requires a separate worker on the user's own local infrastructure.
 - Automation constraints: budget 0; no purchases, supplier contact, posts/messages, paid actions, wallet/bank/payment page changes or repository code modifications without explicit approval. Local-only compute restrictions apply.
 
-## 12. Illustration and visual asset register
+## 11. Illustration and visual asset register
 
 The following project illustrations were located in the ChatGPT Library. They are project-relevant source assets; binary transfer into this Git repository is a separate operation and must not be claimed until the files are actually present in GitHub. User-supplied personal/equipment photographs and unidentified numeric image files are intentionally excluded from this public asset list pending explicit selection.
 
@@ -183,11 +174,6 @@ The following project illustrations were located in the ChatGPT Library. They ar
 - `Церемония восстановления Root Authority NetCity.webp`
 - `owner-recovery-ceremony-v0.1.png`
 
-### Energy / ZONT field integration
-- `Функциональная схема умной котельной NetCity.webp`
-- `Функциональная схема котельной.webp`
-- `Техническая схема котельной NetCity.webp`
-
 ### Brand / presentation assets
 - `1000017664.gif` — user-identified approved logo/brand asset; preserve as-is.
 - `1000017662.jpg` — related user-supplied brand image; verify exact role before using.
@@ -195,7 +181,9 @@ The following project illustrations were located in the ChatGPT Library. They ar
 
 **Transfer status at this snapshot:** Four editable Mermaid engineering diagrams and `docs/illustrations/README.md` have been committed to `main`. A ZIP transfer bundle with 22 selected original project illustration/brand assets has been assembled at `NetCity_Illustrations_Transfer_2026-11-27.zip` for import through a local Git-capable workflow. The original raster/GIF binaries are not yet confirmed present in the Git repository. Do not mark them uploaded. Next safe action is to import the bundle through Endcode/working clone into `docs/illustrations/` (concepts / engineering / brand), preserve originals and filenames, verify every file in GitHub, then record the resulting commit SHA. Do not include private photos or unrelated screenshots.
 
-## 13. Next priorities
+## 12. Next priorities
+
+**Scope exclusion:** the user's separate boiler/heating work is not part of NetCity. Do not include boiler, ZONT, Climate V2, котельная or related illustrations in NetCity memory, diagrams, asset bundles or architecture unless the user explicitly changes this boundary.
 
 - A first **DRAFT** of KVP Runtime Contract v0.1 is now stored at `docs/KVP_RUNTIME_CONTRACT_v0.1_DRAFT.md` (commit `07fd0bf9e1c933884352ddc2867c4ffa5afe469d`). It defines the event envelope, lifecycle, authorization boundary, scene versions, offline/reconnect, sync, agent dispatch, audit and acceptance test plan. It is an architecture proposal with open decisions; it is not implemented or tested.
 1. Review and finalize KVP Runtime Contract v0.1, resolving the open decisions listed in the draft.
