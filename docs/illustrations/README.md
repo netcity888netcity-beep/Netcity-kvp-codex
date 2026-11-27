@@ -7,7 +7,6 @@ This directory is the canonical home for NetCity visual assets and editable engi
 - `NETCITY_RUNTIME_TOPOLOGY.mmd` — target system topology and boundaries.
 - `DEVICE_TRUST_AUTHORIZATION.mmd` — Hybrid Trust, Device Identity and KVP authorization flow.
 - `COMPUTE_NODE_POWER_THERMAL.mmd` — target compute node component/power/thermal boundary.
-- `ZONT_FIELD_INTEGRATION.mmd` — user-reported boiler-control case and proposed NetCity bridge boundary.
 
 These Mermaid files are source diagrams, not proof of implementation. All target components are marked as proposed/planned where appropriate.
 
