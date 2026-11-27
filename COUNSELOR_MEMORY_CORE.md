@@ -297,3 +297,8 @@ Read `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md` as the consolidated cross
 
 - Editable engineering diagrams are stored in `docs/illustrations/`: runtime topology, Device Trust/Authorization, Compute Node power/thermal boundary, and ZONT field-integration boundary. See `docs/illustrations/README.md`.
 - A 22-file original illustration/brand transfer bundle was assembled for import through a local Git-capable workflow. The ZIP is a transfer package, not proof that original raster/GIF binaries are in GitHub. Verify actual repository files before changing that status.
+
+
+## KVP Runtime Contract v0.1 draft — 2026-11-27
+
+- Draft: `docs/KVP_RUNTIME_CONTRACT_v0.1_DRAFT.md`. Status DRAFT / ARCHITECTURE PROPOSAL; no implementation, schema generation, tests, transport selection or performance proof is claimed.
