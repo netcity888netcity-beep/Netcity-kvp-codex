@@ -154,3 +154,10 @@ Read `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md` as the current consolidat
 Important: these are not blanket implementation claims. The Compute Node is a target configuration, the 8 TB RAM and D2C configuration remain unverified, proposed latency/FPS values are acceptance goals only, Planner tests/build are not confirmed run, and ZONT is not yet integrated into NetCity. The illustration register is complete as an inventory, but original binary assets are not yet confirmed in GitHub. Continue to distinguish project design, implementation, verification and hardware proof.
 
 The user's current instruction authorizes updating repository memory and project documentation only. It does not authorize code changes, merges, deployment, external publication, vendor contact, purchases or money movement. Endcode is an available phone-based execution agent; repository memory is the cross-session source of truth.
+
+
+## Editable illustration sources and original asset bundle — 2026-11-27
+
+- `docs/illustrations/` now contains four editable Mermaid diagrams: `NETCITY_RUNTIME_TOPOLOGY.mmd`, `DEVICE_TRUST_AUTHORIZATION.mmd`, `COMPUTE_NODE_POWER_THERMAL.mmd`, and `ZONT_FIELD_INTEGRATION.mmd`; see `docs/illustrations/README.md`.
+- A 22-file ZIP transfer bundle of selected original project illustrations/brand assets was assembled as `NetCity_Illustrations_Transfer_2026-11-27.zip` for local import through Endcode or a working Git clone.
+- The ZIP is not a GitHub upload. Original raster/GIF binaries remain pending import and verification in `docs/illustrations/`; do not claim they are already committed.
