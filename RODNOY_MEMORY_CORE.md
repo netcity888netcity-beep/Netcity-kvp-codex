@@ -322,7 +322,7 @@ ArchitectRuntime. Это отдельный контур; он не означа
 ## Canonical project state handoff — 2026-11-27
 
 - Canonical consolidated state: `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md`. Read it together with this memory before continuing in a new session or agent environment.
-- It records the Compute Node v0.1 target and unresolved 8 TB RAM/D2C/power/thermal validation; Mobile Spatial Workstation v0.1; proposed KVP Runtime Contract v0.1; current KVP Authorization / Hybrid Trust / Hybrid Identity / Recovery decisions; ZONT field-integration context; Sponsr/funding/growth status; and next priorities.
+- It records the Compute Node v0.1 target and unresolved 8 TB RAM/D2C/power/thermal validation; Mobile Spatial Workstation v0.1; proposed KVP Runtime Contract v0.1; current KVP Authorization / Hybrid Trust / Hybrid Identity / Recovery decisions; Sponsr/funding/growth status; and next priorities.
 - It explicitly separates architecture proposals, written code, added tests, executed tests, integration and hardware proof. No new code, test run, deployment, purchase, supplier contact or payment is claimed by this memory update.
 - User has an Endcode agent on the phone for local code/repository workflows. Treat the Git repository as shared durable memory across ChatGPT and Endcode; read this file and the canonical state handoff before work. No permission to alter product code or merge branches is implied.
 - Project illustration assets have been inventoried in the canonical handoff. Their original binary files are **not yet confirmed uploaded** to GitHub; do not state otherwise. Next step is binary transfer into `docs/illustrations/` through a local Git-capable workflow, preserving originals and excluding private/unrelated photos.
@@ -331,7 +331,7 @@ ArchitectRuntime. Это отдельный контур; он не означа
 
 ## Editable illustration sources and original asset bundle — 2026-11-27
 
-- `docs/illustrations/` now contains four editable Mermaid diagrams: `NETCITY_RUNTIME_TOPOLOGY.mmd`, `DEVICE_TRUST_AUTHORIZATION.mmd`, `COMPUTE_NODE_POWER_THERMAL.mmd`, and `ZONT_FIELD_INTEGRATION.mmd`; see `docs/illustrations/README.md`.
+- `docs/illustrations/` now contains three editable Mermaid diagrams: `NETCITY_RUNTIME_TOPOLOGY.mmd`, `DEVICE_TRUST_AUTHORIZATION.mmd`, `COMPUTE_NODE_POWER_THERMAL.mmd`; see `docs/illustrations/README.md`.
 - A 22-file ZIP transfer bundle of selected original project illustrations/brand assets was assembled as `NetCity_Illustrations_Transfer_2026-11-27.zip` for local import through Endcode or a working Git clone.
 - The ZIP is not a GitHub upload. Original raster/GIF binaries remain pending import and verification in `docs/illustrations/`; do not claim they are already committed.
 
