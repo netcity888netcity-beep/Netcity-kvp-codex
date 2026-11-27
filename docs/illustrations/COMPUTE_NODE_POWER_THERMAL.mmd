@@ -1,0 +1,23 @@
+flowchart TB
+  subgraph N["NetCity Compute Node v0.1 — target configuration"]
+    G["8 × NVIDIA H200 SXM<br/>up to 700 W each"]
+    C["2 × AMD EPYC 9755<br/>500 W TDP each"]
+    R["RAM target 8 TB<br/>QVL / DIMM validation open"]
+    S["NVMe + network + fans<br/>additional system load"]
+    P["GIGABYTE G893-ZD1-AAX3<br/>8U platform"]
+    G --> P
+    C --> P
+    R --> P
+    S --> P
+  end
+  P --> E["Power design review<br/>200–240 V input / PSU topology"]
+  P --> H["Cooling + heat rejection<br/>D2C support not yet confirmed"]
+  E --> F["Electrical engineering<br/>circuits / PDU / UPS"]
+  H --> T["Thermal engineering<br/>room / ventilation / heat exchanger"]
+  F --> O["Home site acceptance<br/>floor / noise / fire / service"]
+  T --> O
+  N -. "component-only reference: 6.6 kW" .-> B["Not measured whole-system draw"]
+  classDef target stroke:#7DF6D1,stroke-width:1.5px,color:#fff,fill:#0A0F1A;
+  classDef caution stroke:#FFB45E,stroke-width:1.5px,color:#fff,fill:#0A0F1A;
+  class N,G,C,R,S,P target;
+  class E,H,F,T,O,B caution;
