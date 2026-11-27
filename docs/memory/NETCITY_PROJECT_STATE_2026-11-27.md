@@ -193,11 +193,12 @@ The following project illustrations were located in the ChatGPT Library. They ar
 - `1000017662.jpg` — related user-supplied brand image; verify exact role before using.
 - Pitch-deck chart exports `chart-*.png` are present in the library; identify their parent deck/slide and avoid committing duplicate exports blindly.
 
-**Transfer status at this snapshot:** Library assets have been catalogued; original binary illustration files are not yet confirmed present in the Git repository. Do not mark them uploaded. Next safe action is to transfer selected source binaries through a binary-capable local Git workflow (Endcode/working clone) into `docs/illustrations/`, preserve originals and filenames, add an index with purpose/status, then record the resulting commit SHA. Do not include private photos or unrelated screenshots.
+**Transfer status at this snapshot:** Four editable Mermaid engineering diagrams and `docs/illustrations/README.md` have been committed to `main`. A ZIP transfer bundle with 22 selected original project illustration/brand assets has been assembled at `NetCity_Illustrations_Transfer_2026-11-27.zip` for import through a local Git-capable workflow. The original raster/GIF binaries are not yet confirmed present in the Git repository. Do not mark them uploaded. Next safe action is to import the bundle through Endcode/working clone into `docs/illustrations/` (concepts / engineering / brand), preserve originals and filenames, verify every file in GitHub, then record the resulting commit SHA. Do not include private photos or unrelated screenshots.
 
 ## 13. Next priorities
 
-1. Finalize KVP Runtime Contract v0.1 as a written, versioned specification.
+- A first **DRAFT** of KVP Runtime Contract v0.1 is now stored at `docs/KVP_RUNTIME_CONTRACT_v0.1_DRAFT.md` (commit `07fd0bf9e1c933884352ddc2867c4ffa5afe469d`). It defines the event envelope, lifecycle, authorization boundary, scene versions, offline/reconnect, sync, agent dispatch, audit and acceptance test plan. It is an architecture proposal with open decisions; it is not implemented or tested.
+1. Review and finalize KVP Runtime Contract v0.1, resolving the open decisions listed in the draft.
 2. Finalize Mobile Runtime v0.1 and Spatial Workspace v0.1 against that contract.
 3. Resolve Planner snapshot/revocation semantics before any execution integration.
 4. Continue the Compute Node engineering dossier: verified RAM QVL, power/cooling/room engineering and comparable written configurations; no vendor contact without approval.
