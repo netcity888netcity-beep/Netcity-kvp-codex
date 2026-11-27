@@ -190,5 +190,5 @@ The following project illustrations were located in the ChatGPT Library. They ar
 2. Finalize Mobile Runtime v0.1 and Spatial Workspace v0.1 against that contract.
 3. Resolve Planner snapshot/revocation semantics before any execution integration.
 4. Continue the Compute Node engineering dossier: verified RAM QVL, power/cooling/room engineering and comparable written configurations; no vendor contact without approval.
-6. Transfer selected illustration binaries into `docs/illustrations/` using Endcode or another binary-capable Git workflow; verify each file in GitHub.
-7. Keep Sponsr/growth work factual and distinguish drafts, public reach, pledges, confirmed receipts and company funding.
+5. Transfer selected illustration binaries into `docs/illustrations/` using Endcode or another binary-capable Git workflow; verify each file in GitHub.
+6. Keep Sponsr/growth work factual and distinguish drafts, public reach, pledges, confirmed receipts and company funding.
