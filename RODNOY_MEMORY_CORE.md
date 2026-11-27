@@ -584,3 +584,8 @@ ArchitectRuntime. Это отдельный контур; он не означа
 - Все документы — архитектурные предложения/согласованные концепты. Rust Skeleton, lib.rs/mod.rs implementation, тесты, TLA+/PlusCal model, FROST/DKG, HSM/TPM integration, storage/network integration и production deployment не создавались.
 - Adversarial Audit — логический разбор сценариев, не выполненные тесты и не формальное доказательство.
 - Следующий этап: утвердить/уточнить три pending решения; проверить конкурентные interleavings (TLA+/PlusCal); после этого подготовить Interface Baseline v0.1. Код и тесты — только по отдельному разрешению.
+
+
+## Canonical project state handoff — 2026-11-27
+
+Read `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md` as the consolidated cross-session handoff. It records current target architecture, engineering constraints, KVP trust/identity/recovery decisions, Endcode workflow and next priorities. It distinguishes proposals from implemented and verified work. Illustration source binaries are inventoried but not yet confirmed uploaded. This update is memory/documentation only; no application code, tests, merge or deployment is authorized.
