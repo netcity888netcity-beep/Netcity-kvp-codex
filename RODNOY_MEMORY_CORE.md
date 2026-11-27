@@ -327,3 +327,10 @@ ArchitectRuntime. Это отдельный контур; он не означа
 - User has an Endcode agent on the phone for local code/repository workflows. Treat the Git repository as shared durable memory across ChatGPT and Endcode; read this file and the canonical state handoff before work. No permission to alter product code or merge branches is implied.
 - Project illustration assets have been inventoried in the canonical handoff. Their original binary files are **not yet confirmed uploaded** to GitHub; do not state otherwise. Next step is binary transfer into `docs/illustrations/` through a local Git-capable workflow, preserving originals and excluding private/unrelated photos.
 - User authorized this task's repository-memory update. This authorization is limited to memory/documentation and does not authorize application code, tests, `IntentRouter.js`, `gh-pages`, deployment, financial or external actions.
+
+
+## Editable illustration sources and original asset bundle — 2026-11-27
+
+- `docs/illustrations/` now contains four editable Mermaid diagrams: `NETCITY_RUNTIME_TOPOLOGY.mmd`, `DEVICE_TRUST_AUTHORIZATION.mmd`, `COMPUTE_NODE_POWER_THERMAL.mmd`, and `ZONT_FIELD_INTEGRATION.mmd`; see `docs/illustrations/README.md`.
+- A 22-file ZIP transfer bundle of selected original project illustrations/brand assets was assembled as `NetCity_Illustrations_Transfer_2026-11-27.zip` for local import through Endcode or a working Git clone.
+- The ZIP is not a GitHub upload. Original raster/GIF binaries remain pending import and verification in `docs/illustrations/`; do not claim they are already committed.
