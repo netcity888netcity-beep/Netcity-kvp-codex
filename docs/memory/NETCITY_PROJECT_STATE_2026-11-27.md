@@ -181,6 +181,15 @@ The following project illustrations were located in the ChatGPT Library. They ar
 
 **Transfer status at this snapshot:** Four editable Mermaid engineering diagrams and `docs/illustrations/README.md` have been committed to `main`. A ZIP transfer bundle with 22 selected original project illustration/brand assets has been assembled at `NetCity_Illustrations_Transfer_2026-11-27.zip` for import through a local Git-capable workflow. The original raster/GIF binaries are not yet confirmed present in the Git repository. Do not mark them uploaded. Next safe action is to import the bundle through Endcode/working clone into `docs/illustrations/` (concepts / engineering / brand), preserve originals and filenames, verify every file in GitHub, then record the resulting commit SHA. Do not include private photos or unrelated screenshots.
 
+## Repository visibility review — 2026-11-27
+
+- Verified current visibility: `public`; default branch: `main`.
+- No visibility setting was changed. Owner decision is pending.
+- Recommended target model: retain a curated public-facing repository for project overview, approved high-level diagrams, safe demos and contribution material; move proprietary implementation, detailed authorization/trust/recovery internals, threat models, deployment details and other confidential engineering material to a private canonical repository.
+- Before migration, inventory public forks, clones, GitHub Pages dependencies, Actions logs/artifacts, history and any previously exposed credentials. Deleting a file in a new commit does not erase copies in old commits, forks, clones or caches.
+- Changing the current repository from public to private does not make existing public forks private; GitHub documents that public forks remain public and detach. On GitHub Free, published Pages is automatically unpublished when a repository becomes private. Stars/watchers are also erased by visibility change. Verify plan and Pages architecture before any toggle.
+- Security decision is intentionally pending; this record is a recommendation, not authorization to change visibility, create/migrate repositories or rewrite Git history.
+
 ## 12. Next priorities
 
 **Project scope rule:** keep unrelated parallel workstreams outside NetCity memory, architecture, diagrams and asset bundles unless the user explicitly connects them.
