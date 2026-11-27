@@ -295,7 +295,7 @@ Read `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md` as the consolidated cross
 
 ## Illustration sources and transfer bundle — 2026-11-27
 
-- Editable engineering diagrams are stored in `docs/illustrations/`: runtime topology, Device Trust/Authorization, Compute Node power/thermal boundary, and ZONT field-integration boundary. See `docs/illustrations/README.md`.
+- Editable engineering diagrams are stored in `docs/illustrations/`: runtime topology, Device Trust/Authorization, Compute Node power/thermal boundary,. See `docs/illustrations/README.md`.
 - A 22-file original illustration/brand transfer bundle was assembled for import through a local Git-capable workflow. The ZIP is a transfer package, not proof that original raster/GIF binaries are in GitHub. Verify actual repository files before changing that status.
 
 
