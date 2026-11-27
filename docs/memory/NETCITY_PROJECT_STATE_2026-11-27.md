@@ -183,13 +183,12 @@ The following project illustrations were located in the ChatGPT Library. They ar
 
 ## 12. Next priorities
 
-**Scope exclusion:** the user's separate boiler/heating work is not part of NetCity. Do not include boiler, ZONT, Climate V2, котельная or related illustrations in NetCity memory, diagrams, asset bundles or architecture unless the user explicitly changes this boundary.
+**Project scope rule:** keep unrelated parallel workstreams outside NetCity memory, architecture, diagrams and asset bundles unless the user explicitly connects them.
 
 - A first **DRAFT** of KVP Runtime Contract v0.1 is now stored at `docs/KVP_RUNTIME_CONTRACT_v0.1_DRAFT.md` (commit `07fd0bf9e1c933884352ddc2867c4ffa5afe469d`). It defines the event envelope, lifecycle, authorization boundary, scene versions, offline/reconnect, sync, agent dispatch, audit and acceptance test plan. It is an architecture proposal with open decisions; it is not implemented or tested.
 1. Review and finalize KVP Runtime Contract v0.1, resolving the open decisions listed in the draft.
 2. Finalize Mobile Runtime v0.1 and Spatial Workspace v0.1 against that contract.
 3. Resolve Planner snapshot/revocation semantics before any execution integration.
 4. Continue the Compute Node engineering dossier: verified RAM QVL, power/cooling/room engineering and comparable written configurations; no vendor contact without approval.
-5. Treat ZONT/Climate V2 as a separate field integration case; first resolve account ownership through legitimate vendor support/account recovery.
 6. Transfer selected illustration binaries into `docs/illustrations/` using Endcode or another binary-capable Git workflow; verify each file in GitHub.
 7. Keep Sponsr/growth work factual and distinguish drafts, public reach, pledges, confirmed receipts and company funding.
