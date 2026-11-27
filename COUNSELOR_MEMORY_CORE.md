@@ -286,3 +286,8 @@ NetCity — это не приложение. Это **Убежище для с�
 - Ролевую модель C1–C5, обязательность C1 для штатных критических изменений и проект Owner Recovery Ceremony согласовали на архитектурном уровне.
 - Библиотека иллюстраций создана в `work/spatial-planner`, но первая бинарная иллюстрация пока не загружена в GitHub.
 - Не создавать код, тесты, криптографические реализации или дополнительные коммиты за пределами отдельно разрешённого объёма.
+
+
+## Canonical project state handoff — 2026-11-27
+
+Read `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md` as the consolidated cross-session handoff. It records current target architecture, engineering constraints, KVP trust/identity/recovery decisions, Endcode workflow and next priorities. It distinguishes proposals from implemented and verified work. Illustration source binaries are inventoried but not yet confirmed uploaded. This update is memory/documentation only; no application code, tests, merge or deployment is authorized.
