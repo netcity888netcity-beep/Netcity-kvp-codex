@@ -193,7 +193,7 @@ The following project illustrations were located in the ChatGPT Library. They ar
 - `1000017662.jpg` — related user-supplied brand image; verify exact role before using.
 - Pitch-deck chart exports `chart-*.png` are present in the library; identify their parent deck/slide and avoid committing duplicate exports blindly.
 
-**Transfer status at this snapshot:** Library assets have been catalogued; original binary illustration files are not yet confirmed present in the Git repository. Do not mark them uploaded. Next safe action is to transfer selected source binaries through a binary-capable local Git workflow (Endcode/working clone) into `docs/illustrations/`, preserve originals and filenames, add an index with purpose/status, then record the resulting commit SHA. Do not include private photos or unrelated screenshots.
+**Transfer status at this snapshot:** Four editable Mermaid engineering diagrams and `docs/illustrations/README.md` have been committed to `main`. A ZIP transfer bundle with 22 selected original project illustration/brand assets has been assembled at `NetCity_Illustrations_Transfer_2026-11-27.zip` for import through a local Git-capable workflow. The original raster/GIF binaries are not yet confirmed present in the Git repository. Do not mark them uploaded. Next safe action is to import the bundle through Endcode/working clone into `docs/illustrations/` (concepts / engineering / brand), preserve originals and filenames, verify every file in GitHub, then record the resulting commit SHA. Do not include private photos or unrelated screenshots.
 
 ## 13. Next priorities
 
