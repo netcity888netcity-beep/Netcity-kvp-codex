@@ -13,6 +13,8 @@ These Mermaid files are source diagrams, not proof of implementation. All target
 
 ## Original image assets catalogued, binary transfer pending
 
+A transfer bundle containing 22 selected original project illustrations/brand assets has been assembled from the ChatGPT Library for import through a local Git-capable workflow. The bundle is not itself a GitHub upload; verify each binary after import.
+
 See `docs/memory/NETCITY_PROJECT_STATE_2026-11-27.md`, section 12, for the curated Library asset inventory. Original raster/GIF files are not marked as uploaded until their bytes are present in this directory and verified in GitHub.
 
 When transferring originals:
